@@ -7,5 +7,9 @@ namespace ClothStoreApi.Models
         public List<int> ProductIds { get; set; } = new List<int>();
         public decimal TotalAmount { get; set; }
         public DateTime OrderDate { get; set; } = DateTime.UtcNow;
+
+
+        
+        public Customer? Customer { get; set; } // Navigation property
     }
 }
