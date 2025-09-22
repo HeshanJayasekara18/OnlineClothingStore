@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect  } from "react";
 import { useNavigate } from "react-router-dom";
-
 
 export default function Navbar() {
   const navigate = useNavigate();
 
-
   const [activeTab, setActiveTab] = useState("Flash Sale"); // Flash Sale tab is focused/active by default
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  // For demo purposes, using state. Replace with actual localStorage in your app:
+  // const firstName = localStorage.getItem("customerFirstName");
 
   const handleTabClick = (tabName) => {
     setActiveTab(tabName);
@@ -48,6 +49,10 @@ export default function Navbar() {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
+  const handleAuthClick = () => {
+    navigate("/auth");
+  };
+
   const navItems = [
     { name: "Home", href: "#" },
     { name: "New Arrivals", href: "#" },
@@ -56,6 +61,16 @@ export default function Navbar() {
     { name: "Men", href: "#" },
     { name: "Flash Sale", href: "#" }
   ];
+
+  const [firstName, setFirstName] = useState(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("loggedUser");
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      setFirstName(user.firstName);
+    }
+  }, []);
 
   return (
     <header className="border-b border-solid border-b-[#f0f2f4]">
@@ -91,21 +106,37 @@ export default function Navbar() {
             ))}
           </nav>
         </div>
-        <div className="flex gap-2">
-          <button className="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#f0f2f4] text-[#111418] text-sm font-bold leading-normal tracking-[0.015em] px-2.5 hover:bg-[#e8eaed] transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
-              <path d="M178,32c-20.65,0-38.73,8.88-50,23.89C116.73,40.88,98.65,32,78,32A62.07,62.07,0,0,0,16,94c0,70,103.79,126.66,108.21,129a8,8,0,0,0,7.58,0C136.21,220.66,240,164,240,94A62.07,62.07,0,0,0,178,32ZM128,206.8C109.74,196.16,32,147.69,32,94A46.06,46.06,0,0,1,78,48c19.45,0,35.78,10.36,42.6,27a8,8,0,0,0,14.8,0c6.82-16.67,23.15-27,42.6-27a46.06,46.06,0,0,1,46,46C224,147.61,146.24,196.15,128,206.8Z" />
-            </svg>
-          </button>
-          <button
-            onClick={() => navigate("/cart")}
-            className="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#f0f2f4] text-[#111418] text-sm font-bold leading-normal tracking-[0.015em] px-2.5 hover:bg-[#e8eaed] transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
-              <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,160H40V56H216V200ZM176,88a48,48,0,0,1-96,0,8,8,0,0,1,16,0,32,32,0,0,0,64,0,8,8,0,0,1,16,0Z" />
-            </svg>
-          </button>
-
+        
+        <div className="flex items-center gap-4">
+          {/* User Session Section */}
+          {firstName ? (
+            <span className="text-[#111418] text-sm font-medium">
+              Hello, {firstName} 👋
+            </span>
+          ) : (
+            <button 
+              onClick={handleAuthClick}
+              className="text-[#1773cf] text-sm font-medium hover:text-[#0f5a99] transition-colors"
+            >
+              Login / Sign Up
+            </button>
+          )}
+          
+          <div className="flex gap-2">
+            <button className="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#f0f2f4] text-[#111418] text-sm font-bold leading-normal tracking-[0.015em] px-2.5 hover:bg-[#e8eaed] transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                <path d="M178,32c-20.65,0-38.73,8.88-50,23.89C116.73,40.88,98.65,32,78,32A62.07,62.07,0,0,0,16,94c0,70,103.79,126.66,108.21,129a8,8,0,0,0,7.58,0C136.21,220.66,240,164,240,94A62.07,62.07,0,0,0,178,32ZM128,206.8C109.74,196.16,32,147.69,32,94A46.06,46.06,0,0,1,78,48c19.45,0,35.78,10.36,42.6,27a8,8,0,0,0,14.8,0c6.82-16.67,23.15-27,42.6-27a46.06,46.06,0,0,1,46,46C224,147.61,146.24,196.15,128,206.8Z" />
+              </svg>
+            </button>
+            <button
+              onClick={() => navigate("/cart")}
+              className="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#f0f2f4] text-[#111418] text-sm font-bold leading-normal tracking-[0.015em] px-2.5 hover:bg-[#e8eaed] transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,160H40V56H216V200ZM176,88a48,48,0,0,1-96,0,8,8,0,0,1,16,0,32,32,0,0,0,64,0,8,8,0,0,1,16,0Z" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -124,13 +155,30 @@ export default function Navbar() {
         </div>
         
         <div className="flex items-center gap-3">
+          {/* Mobile User Session */}
+          {firstName ? (
+            <span className="text-[#111418] text-xs font-medium hidden xs:block">
+              Hi, {firstName} 👋
+            </span>
+          ) : (
+            <button 
+              onClick={handleAuthClick}
+              className="text-[#1773cf] text-xs font-medium hover:text-[#0f5a99] transition-colors hidden xs:block"
+            >
+              Login
+            </button>
+          )}
+          
           <div className="flex gap-2">
             <button className="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 w-9 bg-[#f0f2f4] text-[#111418] hover:bg-[#e8eaed] transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" fill="currentColor" viewBox="0 0 256 256">
                 <path d="M178,32c-20.65,0-38.73,8.88-50,23.89C116.73,40.88,98.65,32,78,32A62.07,62.07,0,0,0,16,94c0,70,103.79,126.66,108.21,129a8,8,0,0,0,7.58,0C136.21,220.66,240,164,240,94A62.07,62.07,0,0,0,178,32ZM128,206.8C109.74,196.16,32,147.69,32,94A46.06,46.06,0,0,1,78,48c19.45,0,35.78,10.36,42.6,27a8,8,0,0,0,14.8,0c6.82-16.67,23.15-27,42.6-27a46.06,46.06,0,0,1,46,46C224,147.61,146.24,196.15,128,206.8Z" />
               </svg>
             </button>
-            <button className="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 w-9 bg-[#f0f2f4] text-[#111418] hover:bg-[#e8eaed] transition-colors">
+            <button 
+              onClick={() => navigate("/cart")}
+              className="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 w-9 bg-[#f0f2f4] text-[#111418] hover:bg-[#e8eaed] transition-colors"
+            >
               <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" fill="currentColor" viewBox="0 0 256 256">
                 <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,160H40V56H216V200ZM176,88a48,48,0,0,1-96,0,8,8,0,0,1,16,0,32,32,0,0,0,64,0,8,8,0,0,1,16,0Z" />
               </svg>
@@ -152,6 +200,22 @@ export default function Navbar() {
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white border-t border-[#f0f2f4] px-4 py-2">
+          {/* Mobile Menu User Section */}
+          <div className="border-b border-[#f0f2f4] pb-3 mb-3">
+            {firstName ? (
+              <div className="text-[#111418] text-sm font-medium py-2">
+                Hello, {firstName} 👋
+              </div>
+            ) : (
+              <button 
+                onClick={handleAuthClick}
+                className="text-[#1773cf] text-sm font-medium hover:text-[#0f5a99] transition-colors py-2"
+              >
+                Login / Sign Up
+              </button>
+            )}
+          </div>
+          
           <nav className="flex flex-col space-y-1">
             {navItems.map((item) => (
               <button
