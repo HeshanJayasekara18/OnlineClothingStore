@@ -1,5 +1,6 @@
 using ClothStoreApi.Data;
 using ClothStoreApi.Models;
+using ClothStoreApi.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,11 +11,13 @@ namespace ClothStoreApi.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly StoreContext _context;
+        private readonly CustomerService _customerService;
         private readonly ILogger<OrdersController> _logger;
 
-        public OrdersController(StoreContext context, ILogger<OrdersController> logger)
+        public OrdersController(StoreContext context, CustomerService customerService, ILogger<OrdersController> logger)
         {
             _context = context;
+            _customerService = customerService;
             _logger = logger;
         }
 
@@ -42,10 +45,10 @@ namespace ClothStoreApi.Controllers
                     return BadRequest("Invalid order ID.");
 
                 var order = await _context.Orders.FindAsync(id);
-                
-                if (order == null) 
+
+                if (order == null)
                     return NotFound($"Order with ID {id} not found.");
-                
+
                 return Ok(order);
             }
             catch (Exception ex)
@@ -66,17 +69,17 @@ namespace ClothStoreApi.Controllers
                 if (order == null)
                     return BadRequest("Order data is required.");
 
-                // Validate that customer exists if CustomerId is provided
-                if (order.CustomerId > 0)
+                // Validate customer exists in MongoDB
+                if (!string.IsNullOrWhiteSpace(order.CustomerId))
                 {
-                    var customerExists = await _context.Customers.AnyAsync(c => c.Id == order.CustomerId);
-                    if (!customerExists)
+                    var customer = await _customerService.GetAsync(order.CustomerId);
+                    if (customer == null)
                         return BadRequest($"Customer with ID {order.CustomerId} does not exist.");
                 }
 
                 _context.Orders.Add(order);
                 await _context.SaveChangesAsync();
-                
+
                 _logger.LogInformation("Order created with ID {OrderId}", order.Id);
                 return CreatedAtAction(nameof(Get), new { id = order.Id }, order);
             }
@@ -109,11 +112,11 @@ namespace ClothStoreApi.Controllers
                 if (existingOrder == null)
                     return NotFound($"Order with ID {id} not found.");
 
-                // Validate that customer exists if CustomerId is provided
-                if (order.CustomerId > 0)
+                // Validate customer exists in MongoDB
+                if (!string.IsNullOrWhiteSpace(order.CustomerId))
                 {
-                    var customerExists = await _context.Customers.AnyAsync(c => c.Id == order.CustomerId);
-                    if (!customerExists)
+                    var customer = await _customerService.GetAsync(order.CustomerId);
+                    if (customer == null)
                         return BadRequest($"Customer with ID {order.CustomerId} does not exist.");
                 }
 
@@ -126,7 +129,6 @@ namespace ClothStoreApi.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    // Fixed: Check Orders table instead of Customers
                     if (!await _context.Orders.AnyAsync(e => e.Id == id))
                         return NotFound($"Order with ID {id} not found.");
                     else

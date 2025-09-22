@@ -1,7 +1,6 @@
-using ClothStoreApi.Data;
 using ClothStoreApi.Models;
+using ClothStoreApi.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace ClothStoreApi.Controllers
 {
@@ -9,12 +8,12 @@ namespace ClothStoreApi.Controllers
     [Route("api/[controller]")]
     public class CustomersController : ControllerBase
     {
-        private readonly StoreContext _context;
+        private readonly CustomerService _customerService;
         private readonly ILogger<CustomersController> _logger;
 
-        public CustomersController(StoreContext context, ILogger<CustomersController> logger)
+        public CustomersController(CustomerService customerService, ILogger<CustomersController> logger)
         {
-            _context = context;
+            _customerService = customerService;
             _logger = logger;
         }
 
@@ -23,7 +22,7 @@ namespace ClothStoreApi.Controllers
         {
             try
             {
-                var customers = await _context.Customers.ToListAsync();
+                var customers = await _customerService.GetAsync();
                 return Ok(customers);
             }
             catch (Exception ex)
@@ -34,17 +33,17 @@ namespace ClothStoreApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        public async Task<IActionResult> Get(string id)
         {
+            if (string.IsNullOrWhiteSpace(id))
+                return BadRequest("Invalid customer ID.");
+
             try
             {
-                if (id <= 0)
-                    return BadRequest("Invalid customer ID.");
-
-                var customer = await _context.Customers.FindAsync(id);
-                if (customer == null) 
+                var customer = await _customerService.GetAsync(id);
+                if (customer == null)
                     return NotFound($"Customer with ID {id} not found.");
-                
+
                 return Ok(customer);
             }
             catch (Exception ex)
@@ -54,98 +53,57 @@ namespace ClothStoreApi.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Customer customer)
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] Customer customer)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (customer == null)
+                return BadRequest("Customer data is required.");
+
             try
             {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
-
-                if (customer == null)
-                    return BadRequest("Customer data is required.");
-
-                _context.Customers.Add(customer);
-                await _context.SaveChangesAsync();
-                
-                _logger.LogInformation("Customer created with ID {CustomerId}", customer.Id);
+                await _customerService.CreateAsync(customer);
+                _logger.LogInformation("Customer registered with ID {CustomerId}", customer.Id);
                 return CreatedAtAction(nameof(Get), new { id = customer.Id }, customer);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating customer");
-                return StatusCode(500, "An error occurred while creating the customer.");
+                _logger.LogError(ex, "Error registering customer");
+                return StatusCode(500, "An error occurred while registering the customer.");
             }
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] Customer customer)
+        // New Login Endpoint
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] Customer loginData)
         {
+            if (loginData == null || string.IsNullOrEmpty(loginData.Email) || string.IsNullOrEmpty(loginData.Password))
+                return BadRequest("Email and Password are required.");
+
             try
             {
-                if (id <= 0)
-                    return BadRequest("Invalid customer ID.");
-
+                var customer = await _customerService.GetByEmailAsync(loginData.Email);
                 if (customer == null)
-                    return BadRequest("Customer data is required.");
+                    return Unauthorized("Invalid email or password.");
 
-                if (id != customer.Id)
-                    return BadRequest("Customer ID mismatch.");
+                if (customer.Password != loginData.Password)
+                    return Unauthorized("Invalid email or password.");
 
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
-
-                // Check if customer exists
-                var existingCustomer = await _context.Customers.FindAsync(id);
-                if (existingCustomer == null)
-                    return NotFound($"Customer with ID {id} not found.");
-
-                _context.Entry(existingCustomer).CurrentValues.SetValues(customer);
-
-                try
-                {
-                    await _context.SaveChangesAsync();
-                    _logger.LogInformation("Customer updated with ID {CustomerId}", id);
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!await _context.Customers.AnyAsync(e => e.Id == id))
-                        return NotFound($"Customer with ID {id} not found.");
-                    else
-                        throw;
-                }
-
-                return NoContent();
+                // Return customer info (in production, generate JWT token instead)
+                return Ok(new 
+                { 
+                    Id = customer.Id, 
+                    FirstName = customer.FirstName, 
+                    LastName = customer.LastName, 
+                    Email = customer.Email 
+                });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating customer with ID {CustomerId}", id);
-                return StatusCode(500, "An error occurred while updating the customer.");
-            }
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            try
-            {
-                if (id <= 0)
-                    return BadRequest("Invalid customer ID.");
-
-                var customer = await _context.Customers.FindAsync(id);
-                if (customer == null)
-                    return NotFound($"Customer with ID {id} not found.");
-
-                _context.Customers.Remove(customer);
-                await _context.SaveChangesAsync();
-
-                _logger.LogInformation("Customer deleted with ID {CustomerId}", id);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error deleting customer with ID {CustomerId}", id);
-                return StatusCode(500, "An error occurred while deleting the customer.");
+                _logger.LogError(ex, "Error during login for email {Email}", loginData.Email);
+                return StatusCode(500, "An error occurred while logging in.");
             }
         }
     }
