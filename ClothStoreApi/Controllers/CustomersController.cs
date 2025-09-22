@@ -1,5 +1,6 @@
-using Microsoft.AspNetCore.Mvc;
 using ClothStoreApi.Models;
+using ClothStoreApi.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ClothStoreApi.Controllers
 {
@@ -7,47 +8,103 @@ namespace ClothStoreApi.Controllers
     [Route("api/[controller]")]
     public class CustomersController : ControllerBase
     {
-        private static List<Customer> customers = new List<Customer>();
+        private readonly CustomerService _customerService;
+        private readonly ILogger<CustomersController> _logger;
+
+        public CustomersController(CustomerService customerService, ILogger<CustomersController> logger)
+        {
+            _customerService = customerService;
+            _logger = logger;
+        }
 
         [HttpGet]
-        public IActionResult Get() => Ok(customers);
+        public async Task<IActionResult> Get()
+        {
+            try
+            {
+                var customers = await _customerService.GetAsync();
+                return Ok(customers);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving customers");
+                return StatusCode(500, "An error occurred while retrieving customers.");
+            }
+        }
 
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public async Task<IActionResult> Get(string id)
         {
-            var customer = customers.FirstOrDefault(c => c.Id == id);
-            return customer != null ? Ok(customer) : NotFound();
+            if (string.IsNullOrWhiteSpace(id))
+                return BadRequest("Invalid customer ID.");
+
+            try
+            {
+                var customer = await _customerService.GetAsync(id);
+                if (customer == null)
+                    return NotFound($"Customer with ID {id} not found.");
+
+                return Ok(customer);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving customer with ID {CustomerId}", id);
+                return StatusCode(500, "An error occurred while retrieving the customer.");
+            }
         }
 
-        [HttpPost]
-        public IActionResult Create(Customer customer)
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] Customer customer)
         {
-            customer.Id = customers.Count > 0 ? customers.Max(c => c.Id) + 1 : 1;
-            customers.Add(customer);
-            return CreatedAtAction(nameof(Get), new { id = customer.Id }, customer);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (customer == null)
+                return BadRequest("Customer data is required.");
+
+            try
+            {
+                await _customerService.CreateAsync(customer);
+                _logger.LogInformation("Customer registered with ID {CustomerId}", customer.Id);
+                return CreatedAtAction(nameof(Get), new { id = customer.Id }, customer);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error registering customer");
+                return StatusCode(500, "An error occurred while registering the customer.");
+            }
         }
 
-        [HttpPut("{id}")]
-        public IActionResult Update(int id, Customer updatedCustomer)
+        // New Login Endpoint
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] Customer loginData)
         {
-            var customer = customers.FirstOrDefault(c => c.Id == id);
-            if (customer == null) return NotFound();
+            if (loginData == null || string.IsNullOrEmpty(loginData.Email) || string.IsNullOrEmpty(loginData.Password))
+                return BadRequest("Email and Password are required.");
 
-            customer.FullName = updatedCustomer.FullName;
-            customer.Email = updatedCustomer.Email;
-            customer.Phone = updatedCustomer.Phone;
+            try
+            {
+                var customer = await _customerService.GetByEmailAsync(loginData.Email);
+                if (customer == null)
+                    return Unauthorized("Invalid email or password.");
 
-            return Ok(customer);
-        }
+                if (customer.Password != loginData.Password)
+                    return Unauthorized("Invalid email or password.");
 
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
-        {
-            var customer = customers.FirstOrDefault(c => c.Id == id);
-            if (customer == null) return NotFound();
-
-            customers.Remove(customer);
-            return NoContent();
+                // Return customer info (in production, generate JWT token instead)
+                return Ok(new 
+                { 
+                    Id = customer.Id, 
+                    FirstName = customer.FirstName, 
+                    LastName = customer.LastName, 
+                    Email = customer.Email 
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during login for email {Email}", loginData.Email);
+                return StatusCode(500, "An error occurred while logging in.");
+            }
         }
     }
 }

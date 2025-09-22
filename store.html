@@ -1,0 +1,605 @@
+<html>
+  <head>
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link
+      rel="stylesheet"
+      as="style"
+      onload="this.rel='stylesheet'"
+      href="https://fonts.googleapis.com/css2?display=swap&amp;family=Manrope%3Awght%40400%3B500%3B700%3B800&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900"
+    />
+
+    <title>Stitch Design</title>
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  </head>
+  <body>
+    <div
+      class="relative flex h-auto min-h-screen w-full flex-col bg-white group/design-root overflow-x-hidden"
+      style="--checkbox-tick-svg: url('data:image/svg+xml,%3csvg viewBox=%270 0 16 16%27 fill=%27rgb(255,255,255)%27 xmlns=%27http://www.w3.org/2000/svg%27%3e%3cpath d=%27M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z%27/%3e%3c/svg%3e'); --radio-dot-svg: url('data:image/svg+xml,%3csvg viewBox=%270 0 16 16%27 fill=%27rgb(17,20,24)%27 xmlns=%27http://www.w3.org/2000/svg%27%3e%3ccircle cx=%278%27 cy=%278%27 r=%273%27/%3e%3c/svg%3e'); font-family: Manrope, &quot;Noto Sans&quot;, sans-serif;"
+    >
+      <div class="layout-container flex h-full grow flex-col">
+        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f0f2f4] px-10 py-3">
+          <div class="flex items-center gap-8">
+            <div class="flex items-center gap-4 text-[#111418]">
+              <div class="size-4">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M13.8261 30.5736C16.7203 29.8826 20.2244 29.4783 24 29.4783C27.7756 29.4783 31.2797 29.8826 34.1739 30.5736C36.9144 31.2278 39.9967 32.7669 41.3563 33.8352L24.8486 7.36089C24.4571 6.73303 23.5429 6.73303 23.1514 7.36089L6.64374 33.8352C8.00331 32.7669 11.0856 31.2278 13.8261 30.5736Z"
+                    fill="currentColor"
+                  ></path>
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M39.998 35.764C39.9944 35.7463 39.9875 35.7155 39.9748 35.6706C39.9436 35.5601 39.8949 35.4259 39.8346 35.2825C39.8168 35.2403 39.7989 35.1993 39.7813 35.1602C38.5103 34.2887 35.9788 33.0607 33.7095 32.5189C30.9875 31.8691 27.6413 31.4783 24 31.4783C20.3587 31.4783 17.0125 31.8691 14.2905 32.5189C12.0012 33.0654 9.44505 34.3104 8.18538 35.1832C8.17384 35.2075 8.16216 35.233 8.15052 35.2592C8.09919 35.3751 8.05721 35.4886 8.02977 35.589C8.00356 35.6848 8.00039 35.7333 8.00004 35.7388C8.00004 35.739 8 35.7393 8.00004 35.7388C8.00004 35.7641 8.0104 36.0767 8.68485 36.6314C9.34546 37.1746 10.4222 37.7531 11.9291 38.2772C14.9242 39.319 19.1919 40 24 40C28.8081 40 33.0758 39.319 36.0709 38.2772C37.5778 37.7531 38.6545 37.1746 39.3151 36.6314C39.9006 36.1499 39.9857 35.8511 39.998 35.764ZM4.95178 32.7688L21.4543 6.30267C22.6288 4.4191 25.3712 4.41909 26.5457 6.30267L43.0534 32.777C43.0709 32.8052 43.0878 32.8338 43.104 32.8629L41.3563 33.8352C43.104 32.8629 43.1038 32.8626 43.104 32.8629L43.1051 32.865L43.1065 32.8675L43.1101 32.8739L43.1199 32.8918C43.1276 32.906 43.1377 32.9246 43.1497 32.9473C43.1738 32.9925 43.2062 33.0545 43.244 33.1299C43.319 33.2792 43.4196 33.489 43.5217 33.7317C43.6901 34.1321 44 34.9311 44 35.7391C44 37.4427 43.003 38.7775 41.8558 39.7209C40.6947 40.6757 39.1354 41.4464 37.385 42.0552C33.8654 43.2794 29.133 44 24 44C18.867 44 14.1346 43.2794 10.615 42.0552C8.86463 41.4464 7.30529 40.6757 6.14419 39.7209C4.99695 38.7775 3.99999 37.4427 3.99999 35.7391C3.99999 34.8725 4.29264 34.0922 4.49321 33.6393C4.60375 33.3898 4.71348 33.1804 4.79687 33.0311C4.83898 32.9556 4.87547 32.8935 4.9035 32.8471C4.91754 32.8238 4.92954 32.8043 4.93916 32.7889L4.94662 32.777L4.95178 32.7688ZM35.9868 29.004L24 9.77997L12.0131 29.004C12.4661 28.8609 12.9179 28.7342 13.3617 28.6282C16.4281 27.8961 20.0901 27.4783 24 27.4783C27.9099 27.4783 31.5719 27.8961 34.6383 28.6282C35.082 28.7342 35.5339 28.8609 35.9868 29.004Z"
+                    fill="currentColor"
+                  ></path>
+                </svg>
+              </div>
+              <h2 class="text-[#111418] text-lg font-bold leading-tight tracking-[-0.015em]">Fashion Hub</h2>
+            </div>
+            <div class="flex items-center gap-9">
+              <a class="text-[#111418] text-sm font-medium leading-normal" href="#">New Arrivals</a>
+              <a class="text-[#111418] text-sm font-medium leading-normal" href="#">Men</a>
+              <a class="text-[#111418] text-sm font-medium leading-normal" href="#">Women</a>
+              <a class="text-[#111418] text-sm font-medium leading-normal" href="#">Kids</a>
+              <a class="text-[#111418] text-sm font-medium leading-normal" href="#">Sale</a>
+            </div>
+          </div>
+          <div class="flex flex-1 justify-end gap-8">
+            <label class="flex flex-col min-w-40 !h-10 max-w-64">
+              <div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+                <div
+                  class="text-[#637588] flex border-none bg-[#f0f2f4] items-center justify-center pl-4 rounded-l-lg border-r-0"
+                  data-icon="MagnifyingGlass"
+                  data-size="24px"
+                  data-weight="regular"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                    <path
+                      d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"
+                    ></path>
+                  </svg>
+                </div>
+                <input
+                  placeholder="Search"
+                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#111418] focus:outline-0 focus:ring-0 border-none bg-[#f0f2f4] focus:border-none h-full placeholder:text-[#637588] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
+                  value=""
+                />
+              </div>
+            </label>
+            <div class="flex gap-2">
+              <button
+                class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#f0f2f4] text-[#111418] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5"
+              >
+                <div class="text-[#111418]" data-icon="Heart" data-size="20px" data-weight="regular">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                    <path
+                      d="M178,32c-20.65,0-38.73,8.88-50,23.89C116.73,40.88,98.65,32,78,32A62.07,62.07,0,0,0,16,94c0,70,103.79,126.66,108.21,129a8,8,0,0,0,7.58,0C136.21,220.66,240,164,240,94A62.07,62.07,0,0,0,178,32ZM128,206.8C109.74,196.16,32,147.69,32,94A46.06,46.06,0,0,1,78,48c19.45,0,35.78,10.36,42.6,27a8,8,0,0,0,14.8,0c6.82-16.67,23.15-27,42.6-27a46.06,46.06,0,0,1,46,46C224,147.61,146.24,196.15,128,206.8Z"
+                    ></path>
+                  </svg>
+                </div>
+              </button>
+              <button
+                class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#f0f2f4] text-[#111418] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5"
+              >
+                <div class="text-[#111418]" data-icon="ShoppingBag" data-size="20px" data-weight="regular">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                    <path
+                      d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,160H40V56H216V200ZM176,88a48,48,0,0,1-96,0,8,8,0,0,1,16,0,32,32,0,0,0,64,0,8,8,0,0,1,16,0Z"
+                    ></path>
+                  </svg>
+                </div>
+              </button>
+            </div>
+          </div>
+        </header>
+        <div class="gap-1 px-6 flex flex-1 justify-center py-5">
+          <div class="layout-content-container flex flex-col w-80">
+            <h3 class="text-[#111418] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Filters</h3>
+            <div class="@container">
+              <div class="relative flex w-full flex-col items-start justify-between gap-3 p-4 @[480px]:flex-row">
+                <p class="text-[#111418] text-base font-medium leading-normal w-full shrink-[3]">Price Range</p>
+                <div class="flex h-[38px] w-full pt-1.5">
+                  <div class="flex h-1 w-full rounded-sm bg-[#dce0e5] pl-[60%] pr-[15%]">
+                    <div class="relative">
+                      <div class="absolute -left-3 -top-1.5 flex flex-col items-center gap-1">
+                        <div class="size-4 rounded-full bg-[#111418]"></div>
+                        <p class="text-[#111418] text-sm font-normal leading-normal">$20</p>
+                      </div>
+                    </div>
+                    <div class="h-1 flex-1 rounded-sm bg-[#111418]"></div>
+                    <div class="relative">
+                      <div class="absolute -left-3 -top-1.5 flex flex-col items-center gap-1">
+                        <div class="size-4 rounded-full bg-[#111418]"></div>
+                        <p class="text-[#111418] text-sm font-normal leading-normal">$200</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <h3 class="text-[#111418] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Sort By</h3>
+            <div class="flex flex-col gap-3 p-4">
+              <label class="flex items-center gap-4 rounded-lg border border-solid border-[#dce0e5] p-[15px]">
+                <input
+                  type="radio"
+                  class="h-5 w-5 border-2 border-[#dce0e5] bg-transparent text-transparent checked:border-[#111418] checked:bg-[image:--radio-dot-svg] focus:outline-none focus:ring-0 focus:ring-offset-0 checked:focus:border-[#111418]"
+                  name="7abf39d7-3240-4eb8-9150-b85e092f8f13"
+                  checked=""
+                />
+                <div class="flex grow flex-col"><p class="text-[#111418] text-sm font-medium leading-normal">Featured</p></div>
+              </label>
+              <label class="flex items-center gap-4 rounded-lg border border-solid border-[#dce0e5] p-[15px]">
+                <input
+                  type="radio"
+                  class="h-5 w-5 border-2 border-[#dce0e5] bg-transparent text-transparent checked:border-[#111418] checked:bg-[image:--radio-dot-svg] focus:outline-none focus:ring-0 focus:ring-offset-0 checked:focus:border-[#111418]"
+                  name="7abf39d7-3240-4eb8-9150-b85e092f8f13"
+                />
+                <div class="flex grow flex-col"><p class="text-[#111418] text-sm font-medium leading-normal">Price: Low to High</p></div>
+              </label>
+              <label class="flex items-center gap-4 rounded-lg border border-solid border-[#dce0e5] p-[15px]">
+                <input
+                  type="radio"
+                  class="h-5 w-5 border-2 border-[#dce0e5] bg-transparent text-transparent checked:border-[#111418] checked:bg-[image:--radio-dot-svg] focus:outline-none focus:ring-0 focus:ring-offset-0 checked:focus:border-[#111418]"
+                  name="7abf39d7-3240-4eb8-9150-b85e092f8f13"
+                />
+                <div class="flex grow flex-col"><p class="text-[#111418] text-sm font-medium leading-normal">Price: High to Low</p></div>
+              </label>
+              <label class="flex items-center gap-4 rounded-lg border border-solid border-[#dce0e5] p-[15px]">
+                <input
+                  type="radio"
+                  class="h-5 w-5 border-2 border-[#dce0e5] bg-transparent text-transparent checked:border-[#111418] checked:bg-[image:--radio-dot-svg] focus:outline-none focus:ring-0 focus:ring-offset-0 checked:focus:border-[#111418]"
+                  name="7abf39d7-3240-4eb8-9150-b85e092f8f13"
+                />
+                <div class="flex grow flex-col"><p class="text-[#111418] text-sm font-medium leading-normal">Newest</p></div>
+              </label>
+            </div>
+            <h3 class="text-[#111418] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Type of Clothing</h3>
+            <div class="px-4">
+              <label class="flex gap-x-3 py-3 flex-row">
+                <input
+                  type="checkbox"
+                  class="h-5 w-5 rounded border-[#dce0e5] border-2 bg-transparent text-[#1773cf] checked:bg-[#1773cf] checked:border-[#1773cf] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#dce0e5] focus:outline-none"
+                />
+                <p class="text-[#111418] text-base font-normal leading-normal">Shirts</p>
+              </label>
+              <label class="flex gap-x-3 py-3 flex-row">
+                <input
+                  type="checkbox"
+                  class="h-5 w-5 rounded border-[#dce0e5] border-2 bg-transparent text-[#1773cf] checked:bg-[#1773cf] checked:border-[#1773cf] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#dce0e5] focus:outline-none"
+                />
+                <p class="text-[#111418] text-base font-normal leading-normal">Pants</p>
+              </label>
+              <label class="flex gap-x-3 py-3 flex-row">
+                <input
+                  type="checkbox"
+                  class="h-5 w-5 rounded border-[#dce0e5] border-2 bg-transparent text-[#1773cf] checked:bg-[#1773cf] checked:border-[#1773cf] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#dce0e5] focus:outline-none"
+                />
+                <p class="text-[#111418] text-base font-normal leading-normal">Dresses</p>
+              </label>
+              <label class="flex gap-x-3 py-3 flex-row">
+                <input
+                  type="checkbox"
+                  class="h-5 w-5 rounded border-[#dce0e5] border-2 bg-transparent text-[#1773cf] checked:bg-[#1773cf] checked:border-[#1773cf] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#dce0e5] focus:outline-none"
+                />
+                <p class="text-[#111418] text-base font-normal leading-normal">Outerwear</p>
+              </label>
+            </div>
+            <h3 class="text-[#111418] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Material</h3>
+            <div class="px-4">
+              <label class="flex gap-x-3 py-3 flex-row">
+                <input
+                  type="checkbox"
+                  class="h-5 w-5 rounded border-[#dce0e5] border-2 bg-transparent text-[#1773cf] checked:bg-[#1773cf] checked:border-[#1773cf] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#dce0e5] focus:outline-none"
+                />
+                <p class="text-[#111418] text-base font-normal leading-normal">Cotton</p>
+              </label>
+              <label class="flex gap-x-3 py-3 flex-row">
+                <input
+                  type="checkbox"
+                  class="h-5 w-5 rounded border-[#dce0e5] border-2 bg-transparent text-[#1773cf] checked:bg-[#1773cf] checked:border-[#1773cf] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#dce0e5] focus:outline-none"
+                />
+                <p class="text-[#111418] text-base font-normal leading-normal">Wool</p>
+              </label>
+              <label class="flex gap-x-3 py-3 flex-row">
+                <input
+                  type="checkbox"
+                  class="h-5 w-5 rounded border-[#dce0e5] border-2 bg-transparent text-[#1773cf] checked:bg-[#1773cf] checked:border-[#1773cf] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#dce0e5] focus:outline-none"
+                />
+                <p class="text-[#111418] text-base font-normal leading-normal">Silk</p>
+              </label>
+              <label class="flex gap-x-3 py-3 flex-row">
+                <input
+                  type="checkbox"
+                  class="h-5 w-5 rounded border-[#dce0e5] border-2 bg-transparent text-[#1773cf] checked:bg-[#1773cf] checked:border-[#1773cf] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#dce0e5] focus:outline-none"
+                />
+                <p class="text-[#111418] text-base font-normal leading-normal">Denim</p>
+              </label>
+            </div>
+            <h3 class="text-[#111418] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Sleeve Length</h3>
+            <div class="px-4">
+              <label class="flex gap-x-3 py-3 flex-row">
+                <input
+                  type="checkbox"
+                  class="h-5 w-5 rounded border-[#dce0e5] border-2 bg-transparent text-[#1773cf] checked:bg-[#1773cf] checked:border-[#1773cf] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#dce0e5] focus:outline-none"
+                />
+                <p class="text-[#111418] text-base font-normal leading-normal">Short Sleeve</p>
+              </label>
+              <label class="flex gap-x-3 py-3 flex-row">
+                <input
+                  type="checkbox"
+                  class="h-5 w-5 rounded border-[#dce0e5] border-2 bg-transparent text-[#1773cf] checked:bg-[#1773cf] checked:border-[#1773cf] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#dce0e5] focus:outline-none"
+                />
+                <p class="text-[#111418] text-base font-normal leading-normal">Long Sleeve</p>
+              </label>
+              <label class="flex gap-x-3 py-3 flex-row">
+                <input
+                  type="checkbox"
+                  class="h-5 w-5 rounded border-[#dce0e5] border-2 bg-transparent text-[#1773cf] checked:bg-[#1773cf] checked:border-[#1773cf] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#dce0e5] focus:outline-none"
+                />
+                <p class="text-[#111418] text-base font-normal leading-normal">Sleeveless</p>
+              </label>
+            </div>
+            <h3 class="text-[#111418] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Neckline</h3>
+            <div class="px-4">
+              <label class="flex gap-x-3 py-3 flex-row">
+                <input
+                  type="checkbox"
+                  class="h-5 w-5 rounded border-[#dce0e5] border-2 bg-transparent text-[#1773cf] checked:bg-[#1773cf] checked:border-[#1773cf] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#dce0e5] focus:outline-none"
+                />
+                <p class="text-[#111418] text-base font-normal leading-normal">Crew Neck</p>
+              </label>
+              <label class="flex gap-x-3 py-3 flex-row">
+                <input
+                  type="checkbox"
+                  class="h-5 w-5 rounded border-[#dce0e5] border-2 bg-transparent text-[#1773cf] checked:bg-[#1773cf] checked:border-[#1773cf] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#dce0e5] focus:outline-none"
+                />
+                <p class="text-[#111418] text-base font-normal leading-normal">V-Neck</p>
+              </label>
+              <label class="flex gap-x-3 py-3 flex-row">
+                <input
+                  type="checkbox"
+                  class="h-5 w-5 rounded border-[#dce0e5] border-2 bg-transparent text-[#1773cf] checked:bg-[#1773cf] checked:border-[#1773cf] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#dce0e5] focus:outline-none"
+                />
+                <p class="text-[#111418] text-base font-normal leading-normal">Turtleneck</p>
+              </label>
+            </div>
+            <h3 class="text-[#111418] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Occasion</h3>
+            <div class="px-4">
+              <label class="flex gap-x-3 py-3 flex-row">
+                <input
+                  type="checkbox"
+                  class="h-5 w-5 rounded border-[#dce0e5] border-2 bg-transparent text-[#1773cf] checked:bg-[#1773cf] checked:border-[#1773cf] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#dce0e5] focus:outline-none"
+                />
+                <p class="text-[#111418] text-base font-normal leading-normal">Casual</p>
+              </label>
+              <label class="flex gap-x-3 py-3 flex-row">
+                <input
+                  type="checkbox"
+                  class="h-5 w-5 rounded border-[#dce0e5] border-2 bg-transparent text-[#1773cf] checked:bg-[#1773cf] checked:border-[#1773cf] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#dce0e5] focus:outline-none"
+                />
+                <p class="text-[#111418] text-base font-normal leading-normal">Formal</p>
+              </label>
+              <label class="flex gap-x-3 py-3 flex-row">
+                <input
+                  type="checkbox"
+                  class="h-5 w-5 rounded border-[#dce0e5] border-2 bg-transparent text-[#1773cf] checked:bg-[#1773cf] checked:border-[#1773cf] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#dce0e5] focus:outline-none"
+                />
+                <p class="text-[#111418] text-base font-normal leading-normal">Activewear</p>
+              </label>
+            </div>
+            <h3 class="text-[#111418] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Season</h3>
+            <div class="px-4">
+              <label class="flex gap-x-3 py-3 flex-row">
+                <input
+                  type="checkbox"
+                  class="h-5 w-5 rounded border-[#dce0e5] border-2 bg-transparent text-[#1773cf] checked:bg-[#1773cf] checked:border-[#1773cf] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#dce0e5] focus:outline-none"
+                />
+                <p class="text-[#111418] text-base font-normal leading-normal">Spring</p>
+              </label>
+              <label class="flex gap-x-3 py-3 flex-row">
+                <input
+                  type="checkbox"
+                  class="h-5 w-5 rounded border-[#dce0e5] border-2 bg-transparent text-[#1773cf] checked:bg-[#1773cf] checked:border-[#1773cf] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#dce0e5] focus:outline-none"
+                />
+                <p class="text-[#111418] text-base font-normal leading-normal">Summer</p>
+              </label>
+              <label class="flex gap-x-3 py-3 flex-row">
+                <input
+                  type="checkbox"
+                  class="h-5 w-5 rounded border-[#dce0e5] border-2 bg-transparent text-[#1773cf] checked:bg-[#1773cf] checked:border-[#1773cf] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#dce0e5] focus:outline-none"
+                />
+                <p class="text-[#111418] text-base font-normal leading-normal">Autumn</p>
+              </label>
+              <label class="flex gap-x-3 py-3 flex-row">
+                <input
+                  type="checkbox"
+                  class="h-5 w-5 rounded border-[#dce0e5] border-2 bg-transparent text-[#1773cf] checked:bg-[#1773cf] checked:border-[#1773cf] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#dce0e5] focus:outline-none"
+                />
+                <p class="text-[#111418] text-base font-normal leading-normal">Winter</p>
+              </label>
+            </div>
+            <h3 class="text-[#111418] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Color</h3>
+            <div class="flex flex-wrap gap-5 p-4">
+              <label
+                class="size-10 rounded-full border border-[#dce0e5] ring-[color-mix(in_srgb,#111418_50%,_transparent)] has-[:checked]:border-[3px] has-[:checked]:border-white has-[:checked]:ring"
+                style="background-color: rgb(255, 255, 255);"
+              >
+                <input type="radio" class="invisible" name="869826c7-19a4-41e4-99f0-e0c7547200b2" />
+              </label>
+              <label
+                class="size-10 rounded-full border border-[#dce0e5] ring-[color-mix(in_srgb,#111418_50%,_transparent)] has-[:checked]:border-[3px] has-[:checked]:border-white has-[:checked]:ring"
+                style="background-color: rgb(0, 0, 0);"
+              >
+                <input type="radio" class="invisible" name="869826c7-19a4-41e4-99f0-e0c7547200b2" />
+              </label>
+              <label
+                class="size-10 rounded-full border border-[#dce0e5] ring-[color-mix(in_srgb,#111418_50%,_transparent)] has-[:checked]:border-[3px] has-[:checked]:border-white has-[:checked]:ring"
+                style="background-color: rgb(255, 0, 0);"
+              >
+                <input type="radio" class="invisible" name="869826c7-19a4-41e4-99f0-e0c7547200b2" />
+              </label>
+              <label
+                class="size-10 rounded-full border border-[#dce0e5] ring-[color-mix(in_srgb,#111418_50%,_transparent)] has-[:checked]:border-[3px] has-[:checked]:border-white has-[:checked]:ring"
+                style="background-color: rgb(0, 255, 0);"
+              >
+                <input type="radio" class="invisible" name="869826c7-19a4-41e4-99f0-e0c7547200b2" />
+              </label>
+              <label
+                class="size-10 rounded-full border border-[#dce0e5] ring-[color-mix(in_srgb,#111418_50%,_transparent)] has-[:checked]:border-[3px] has-[:checked]:border-white has-[:checked]:ring"
+                style="background-color: rgb(0, 0, 255);"
+              >
+                <input type="radio" class="invisible" name="869826c7-19a4-41e4-99f0-e0c7547200b2" />
+              </label>
+              <label
+                class="size-10 rounded-full border border-[#dce0e5] ring-[color-mix(in_srgb,#111418_50%,_transparent)] has-[:checked]:border-[3px] has-[:checked]:border-white has-[:checked]:ring"
+                style="background-color: rgb(255, 255, 0);"
+              >
+                <input type="radio" class="invisible" name="869826c7-19a4-41e4-99f0-e0c7547200b2" />
+              </label>
+            </div>
+          </div>
+          <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+            <div class="@container">
+              <div class="@[480px]:p-4">
+                <div
+                  class="flex min-h-[480px] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-8 @[480px]:rounded-lg items-start justify-end px-4 pb-10 @[480px]:px-10"
+                  style='background-image: linear-gradient(rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuD6j9kErhFRO2A7ZiyNqf-4yBgMUtlllnGnzFNXCdHmI0byIEPRCh2jPeu6xpovibR3XwGIFjI1hfDsiEIviuX27KjPWAe3aItVzuWqQ8hyPglESwCwm_-xVDpSV8fPvlFknUsQUiZ7724sr8YBYnKpX-lddwGdoCqkKeycBkKUFrVDSnhGZERfim9Q6OMdDmrYP6ISspQSSV1emhKCZL9KEH2Oz0g0t2v09Pjl27sCqW1WerjPWyfZyz7mqHWBwCs0OSTr-ITOCm4");'
+                >
+                  <div class="flex flex-col gap-2 text-left">
+                    <h1
+                      class="text-white text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em]"
+                    >
+                      New Arrivals
+                    </h1>
+                    <h2 class="text-white text-sm font-normal leading-normal @[480px]:text-base @[480px]:font-normal @[480px]:leading-normal">
+                      Explore the latest fashion trends and styles.
+                    </h2>
+                  </div>
+                  <button
+                    class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-[#1773cf] text-white text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em]"
+                  >
+                    <span class="truncate">Shop Now</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-2 p-4">
+              <a class="text-[#637588] text-base font-medium leading-normal" href="#">Home</a>
+              <span class="text-[#637588] text-base font-medium leading-normal">/</span>
+              <span class="text-[#111418] text-base font-medium leading-normal">Clothing</span>
+            </div>
+            <h2 class="text-[#111418] tracking-light text-[28px] font-bold leading-tight px-4 text-left pb-3 pt-5">Clothing</h2>
+            <div class="flex gap-3 p-3 flex-wrap pr-4">
+              <div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#f0f2f4] pl-4 pr-4">
+                <p class="text-[#111418] text-sm font-medium leading-normal">Men</p>
+              </div>
+              <div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#f0f2f4] pl-4 pr-4">
+                <p class="text-[#111418] text-sm font-medium leading-normal">Women</p>
+              </div>
+              <div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#f0f2f4] pl-4 pr-4">
+                <p class="text-[#111418] text-sm font-medium leading-normal">Kids</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4">
+              <div class="flex flex-col gap-3 pb-3">
+                <div
+                  class="w-full bg-center bg-no-repeat aspect-[3/4] bg-cover rounded-lg"
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBzVMML6zIoItR7cOE1ikgGaW5LdbBrOLkojEWEBWtHIg0FjOMvOOZAScOUDJBWaBtrN8mW2DlASHMvgCUQj2yB22EH0MiJye26KrUYhB038B762NMeCdTWmmeX4jiy2sZQ370xnAZo4d9tGn3XOv6TiSS2Pi94i4F3WShVPCA6BTBKqjh8VhH9Qsxt3BcGzCMVhZ12KfgjdRSjlGEVd3nH6fI0pwPnhHJf7-Z177E3h0PX1gwcTMvIY3PV_SgeA9ZtNQ9hLfbcAg4");'
+                ></div>
+                <div>
+                  <p class="text-[#111418] text-base font-medium leading-normal">Classic White Tee</p>
+                  <p class="text-[#637588] text-sm font-normal leading-normal">$25</p>
+                </div>
+              </div>
+              <div class="flex flex-col gap-3 pb-3">
+                <div
+                  class="w-full bg-center bg-no-repeat aspect-[3/4] bg-cover rounded-lg"
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDcfZOc8GkbxKy99w-Sd2_iTMaHKfDX_gb6AOuPRfrFnrjTvbpJCI1mDpkhpxXeLAiTVY90RKOt2R_EIUizN5zHjIrO8IwDYXKPsXw20xczFYMAvnxAs3eKrsRDocngWe1BPEMqbuEa66-3STzVjdPbiK68KZMkG-WgPgD57Sci8U_sgVGOUl0IdSkxGIBD40VTqaTUMDjvfu_KSQBKGFlnV9gdsw6TQtJhl8l3DlDIW14w6H59cviWoPKv909UvFjeVfFzE_Gkp5Q");'
+                ></div>
+                <div>
+                  <p class="text-[#111418] text-base font-medium leading-normal">Slim Fit Jeans</p>
+                  <p class="text-[#637588] text-sm font-normal leading-normal">$60</p>
+                </div>
+              </div>
+              <div class="flex flex-col gap-3 pb-3">
+                <div
+                  class="w-full bg-center bg-no-repeat aspect-[3/4] bg-cover rounded-lg"
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCjA8t-m5iklCop35UR-3jcrO7ENL8MUCz0oTeo2eKnwnZK1yFjTpjLwySIIsFxu6o2CacY_1yqT9ZxESuxhQUy3F8LSJZdyWIdwZp2Xew8mvZziJ8GyTSt9O3xuHNcYJ9Fq5AQp2NuvT6x6ECFZs8xEYTcyIUcrnV0919v0eAN4f978WTQwQuQ0TJCCa5__zsIY_PoZIsavaUkOeQk8Go2f8vrrTbIx2OXUJ1Yt17q9dQFby5hvGRL55z9LCrWM-o73928tX4uWXs");'
+                ></div>
+                <div>
+                  <p class="text-[#111418] text-base font-medium leading-normal">Summer Dress</p>
+                  <p class="text-[#637588] text-sm font-normal leading-normal">$45</p>
+                </div>
+              </div>
+              <div class="flex flex-col gap-3 pb-3">
+                <div
+                  class="w-full bg-center bg-no-repeat aspect-[3/4] bg-cover rounded-lg"
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA6FOTrj8lcdKQ_uktwTDDdUUQ-CfB_paWq-Ic1dvWuZilS-3IVFKTMkV6H7mzdLhIK7k-LKdhGFdMUlhYjfaSz_CQiInCmLJkFEk2mAh3vFKkkq0MJaOdBKwLMLVhclUKMiobgeeqpNzekEp8yiLHhGHuQP5gcrc8Zwkl49IkJIimXaaqvymRlJxOzNmMm7lQ86_rGGAR0b50FALSHDJsvfdulg1IpsmhcFt7Wc7t6POeoYaKiHMQBf0USo6CASGAM-sqLyRXoam8");'
+                ></div>
+                <div>
+                  <p class="text-[#111418] text-base font-medium leading-normal">Kids' Graphic Tee</p>
+                  <p class="text-[#637588] text-sm font-normal leading-normal">$20</p>
+                </div>
+              </div>
+              <div class="flex flex-col gap-3 pb-3">
+                <div
+                  class="w-full bg-center bg-no-repeat aspect-[3/4] bg-cover rounded-lg"
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAxI3XrA7nonDJ1P4oaR4kv2y0CE-fXoXiYFjTv47Tsvzc6rf3HpfyZAOAX96XqVZ8bMreqAfA1Tli5I1xlyF6YvpClWcyuPQouYt4Mv_5N51R6AkqzhVh13ZAptwT8h0b3ibNOWjzOAXLZRcw1wrs7ch7mOedHlfDa6FWyVfVwXgdsSBQMmc6vq8uQui35o4Q_C_I4yGemEECjGLsf6cHN5VCVhQDNY7zh-hiJLC_CDiXeKLOh5C153ShkrzwZt4KpSdmcVsxVVJ4");'
+                ></div>
+                <div>
+                  <p class="text-[#111418] text-base font-medium leading-normal">Men's Casual Shirt</p>
+                  <p class="text-[#637588] text-sm font-normal leading-normal">$55</p>
+                </div>
+              </div>
+              <div class="flex flex-col gap-3 pb-3">
+                <div
+                  class="w-full bg-center bg-no-repeat aspect-[3/4] bg-cover rounded-lg"
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAXjlqV_9PVEiy3kN8OXUPPkI3exrO0ZDUnZkw_mvgDLpf5m06NHdPn0-X_fGwf2xmwSpo3WKfACpdGLdmmCmLVyz4IUD0hmyMsZeAIEAkBferwK2iJDaTWJPgsc72xBPfKc79VYpOjmJk4b_O6aFbmja8j6dobyoTrs4mNjDKPmOU0658Glb6M9Xw6wifG54ho2rS5vqTl8meOhxI4bC-OwKcVL4oPc8lscM5HxlWBbJwObY_ld5oT8SVf6aIijgJCNM1XXTwO-2w");'
+                ></div>
+                <div>
+                  <p class="text-[#111418] text-base font-medium leading-normal">Women's Blouse</p>
+                  <p class="text-[#637588] text-sm font-normal leading-normal">$40</p>
+                </div>
+              </div>
+              <div class="flex flex-col gap-3 pb-3">
+                <div
+                  class="w-full bg-center bg-no-repeat aspect-[3/4] bg-cover rounded-lg"
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAwkSTuAL4L56hfCNDA4aliO5nAuYDLrKMwyVJ-2VdYYLLTejL4_99rOJPjDkvdxD_A3hsNXT2uU8anRKSnKBBu4Q9XQhvmsPptBn_jUIQ6lGYDI1zmzvAPYVPN5bST9LVzUqJP2IGT95z3xDksWwTfwMRFLPYQABvFzbdxLK2gqGObi060H6G0sVS3jIKmDQlXXcx57fUKvuGlL_HwEvCMYfz68ysXYujAxAER71zfUjxAt41bp6twN-yq1CO1JpjM0XeFpf2DTJ4");'
+                ></div>
+                <div>
+                  <p class="text-[#111418] text-base font-medium leading-normal">Kids' Denim Shorts</p>
+                  <p class="text-[#637588] text-sm font-normal leading-normal">$18</p>
+                </div>
+              </div>
+              <div class="flex flex-col gap-3 pb-3">
+                <div
+                  class="w-full bg-center bg-no-repeat aspect-[3/4] bg-cover rounded-lg"
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBoYl4r5SAdMU7d0obSxm6RpDe_nDOrwImpVKPEUbY57Sj-lZLZvk0E7OsmWmFtBt25WEgVSMzKuxNfUIs91KPty48p1nfzuY5cGJ7qLWnPM7ZNRszIeDmtF4XFgl4-1T_uoODL6JJpxPZtxPe8k_PFOTmMqCxnujg7gforbhr60UgpsrPs4Vri1CtJPFqIxsrQSv26VVImV23dEGshxV6kOnXXcw5xEOK02-uOGlfYwSi2tuRWC4ipA4WQ1PZRNiYef4aAXQ4xnHY");'
+                ></div>
+                <div>
+                  <p class="text-[#111418] text-base font-medium leading-normal">Men's Chinos</p>
+                  <p class="text-[#637588] text-sm font-normal leading-normal">$50</p>
+                </div>
+              </div>
+              <div class="flex flex-col gap-3 pb-3">
+                <div
+                  class="w-full bg-center bg-no-repeat aspect-[3/4] bg-cover rounded-lg"
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAlUQSIkwYpwItmgpKZgRCVwaG1psHhFaQ3gQuX2zNFuNGf6lqLT_TuEfRSBZhFE-tlCRuOvMNezkz10gA_WMNjEEKi5_m-jYMRyiwoKg6VzL821xHtFteAaLhiBjJRvmZFSsRfhJq4niwzlozkF-n3yOZcnzr7AYz7qryUpocYG8UQMomOzykwHctPfuOnAfuCEiNUEwW1ETjUVGwU1HVWIpKCfqmwb6a_DWuphH971juwtsTNruTyMVdp9OoolgYUPV9wGDgw1Ng");'
+                ></div>
+                <div>
+                  <p class="text-[#111418] text-base font-medium leading-normal">Women's Skirt</p>
+                  <p class="text-[#637588] text-sm font-normal leading-normal">$35</p>
+                </div>
+              </div>
+              <div class="flex flex-col gap-3 pb-3">
+                <div
+                  class="w-full bg-center bg-no-repeat aspect-[3/4] bg-cover rounded-lg"
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCG4Ri4MPh-r1jl6YKq6zg3WPPi136HHn8ijl0v40ehg2L78RMHi_h7Z-kQRHM6hyhi4PkgIb7jLcCmnFhRT11YyOVe1fvryxUTNebu5CtJsV1BiUYv7q1TAkBo0gHm9nipuYKkYa_lHPsmFBXEpxNivN6etKrjFCrb-82_6grcDAT6-uGs6ncNAOwlUdfpY4iB7BW5WtTRaNyFFcIeCx4NX-p4Sx-qo22LrDQJbW56CMdfvY2AJdY-f0T0tKDu3dOxIasYQ9mVSLs");'
+                ></div>
+                <div>
+                  <p class="text-[#111418] text-base font-medium leading-normal">Kids' Summer Dress</p>
+                  <p class="text-[#637588] text-sm font-normal leading-normal">$22</p>
+                </div>
+              </div>
+              <div class="flex flex-col gap-3 pb-3">
+                <div
+                  class="w-full bg-center bg-no-repeat aspect-[3/4] bg-cover rounded-lg"
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDW8aqi5vromq4t49bZeHP78ci3caDrEFr-OfWFpmE-G4bcokG8_RL3bytqk8XGbDOQGaC2tvWsp4fE7n4DV7NfY9H97pFIYk5o6HrI3dVCjrBjV-0e5UD4Jxnip-IPASMCMhYUFggsAcgHwfVBcz51dbF3MD37OY98TnQ9adF7G2p7bOqYkNDRFb5X_fqIbORNbzF20-cFIVJD_90SRNv1Em_mNdwFk_cHiY-Li6kfOYrhCmnqJHuk7SSsMrg8VbTDx7nn2L0-n98");'
+                ></div>
+                <div>
+                  <p class="text-[#111418] text-base font-medium leading-normal">Men's Polo Shirt</p>
+                  <p class="text-[#637588] text-sm font-normal leading-normal">$48</p>
+                </div>
+              </div>
+              <div class="flex flex-col gap-3 pb-3">
+                <div
+                  class="w-full bg-center bg-no-repeat aspect-[3/4] bg-cover rounded-lg"
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDLcb6Y0yuWLkQWODi3L4GU-HlnCxV4cY2M4hrruCsAOVITf-aBWp0HY1USE1AxPdDPIRjdX-l_845fTEreb33ber-QbAIG73q8HlpIMWwerajQHLWVqBdAeHuTQz3isyJKPjtz6pLpINE-HI2hV5poVMb4eUeuel-49Ud5HDlB-euMikHyItLNGEEGGzzCJpQHE7nTBU-b6MSNSGit0rS8SiYsRtC-REzKO_unk_DiXWW70pxGWv-JJMCu2jq7cVp_vDSaJ5DUepk");'
+                ></div>
+                <div>
+                  <p class="text-[#111418] text-base font-medium leading-normal">Women's Cardigan</p>
+                  <p class="text-[#637588] text-sm font-normal leading-normal">$52</p>
+                </div>
+              </div>
+              <div class="flex flex-col gap-3 pb-3">
+                <div
+                  class="w-full bg-center bg-no-repeat aspect-[3/4] bg-cover rounded-lg"
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB4uU77tAIZT6LHgl6_KApA-dpT3PJt3UNr2aDRvQZOAnzWyr-DEmkIq0hY9RVgTEY-Su4tRC5kTilsPwEnbO9Zo5DJORR2afdddr_rbsIUUsYmjqEPQIsjaztaaxbUjBaWVI1r6wMaSo3oE09Lh7n_t8rRPIAwts_qNaDwM-hwCeXRSbGt2LbuXaI30I-utH5UXH_BgtT7wv8BW9OPd24iI_nZ8TqCn3ATehDJB4zCQOmzf7uIcosqJ2ti_-WdaQ6WE9EJGcDK53M");'
+                ></div>
+                <div>
+                  <p class="text-[#111418] text-base font-medium leading-normal">Kids' Hooded Sweatshirt</p>
+                  <p class="text-[#637588] text-sm font-normal leading-normal">$28</p>
+                </div>
+              </div>
+              <div class="flex flex-col gap-3 pb-3">
+                <div
+                  class="w-full bg-center bg-no-repeat aspect-[3/4] bg-cover rounded-lg"
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCCCSwgiafWIAnwFZVVEGAYWl0iZWsbVlIf_D7lsBnH6OW5coLbr3Kr-uL5fIpXHkzgmVfTSHp0pDIEVm59UVUBNgHSzQxXNrqPa-a3qH9bddUCxmZQVHZeoOXZWtvy_cBaeZd-Kj6hlPACPdPUjZ077XLJaHemDbyT7zVSdpL7NR62L-v6eWDz4PQpoT1t8a4v2aivc9aUXivNup9LbNkEuDOM5A64v6joF4Jex5ersFFU5SmHFlP6J8nqCCmyMDQNxDjDyo3E8FQ");'
+                ></div>
+                <div>
+                  <p class="text-[#111418] text-base font-medium leading-normal">Men's Blazer</p>
+                  <p class="text-[#637588] text-sm font-normal leading-normal">$75</p>
+                </div>
+              </div>
+              <div class="flex flex-col gap-3 pb-3">
+                <div
+                  class="w-full bg-center bg-no-repeat aspect-[3/4] bg-cover rounded-lg"
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBVtJZxx8gI1j6ng9VqHRmYoZQ8By0k8QDCWI3a4jvCFcQPQUyT6ObYrVaBO-NRs_oSG3eLz_Z9Tyb35D5sAFgBFQBoyFZSL-mC92nVTPVTAmszOuRuIAgLJ7Qexnqdtg1aq5jlX9mZ_geqLc5nLf82fYgugo-6n5EFTeIM_TOLRT7x1z88mWLJPuKBJGv7gb9_65smykUKcb9yuvuU3i8_FCnOioKKukwFSBg9fQyQlm_CHMaw9fJQ9v6jMn24Hh-GBjkCOq9kOPE");'
+                ></div>
+                <div>
+                  <p class="text-[#111418] text-base font-medium leading-normal">Women's Jumpsuit</p>
+                  <p class="text-[#637588] text-sm font-normal leading-normal">$68</p>
+                </div>
+              </div>
+            </div>
+            <div class="@container">
+              <div class="@[480px]:p-4">
+                <div
+                  class="flex min-h-[480px] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-8 @[480px]:rounded-lg items-center justify-center p-4"
+                  style='background-image: linear-gradient(rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuDWct334cmuSxUNHf_vRn_l3WHfdO53BhoKqScmt79i3-gUiym9KBIn50JAJMRxxMWEh9tSmI_o2ahCOC4lHochnr9V9PKYdsy8Ue25JXbURNRwWduEmNqPfYIfExG2tUk7AFx_jSSc9DKVrZaErrsugxDvk458lEGkQM7Deq4vXN875E82JXWL8AnmRc3HJP38W61Gc-1OBQQY0MuqabK2CaK49UcIa3nZgDhftJXyCsowIuEeG3P90o9f5XOWNMwKXhv8AQ5fdgY");'
+                >
+                  <div class="flex flex-col gap-2 text-center">
+                    <h1
+                      class="text-white text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em]"
+                    >
+                      Fresh Styles Just In
+                    </h1>
+                    <h2 class="text-white text-sm font-normal leading-normal @[480px]:text-base @[480px]:font-normal @[480px]:leading-normal">
+                      Discover our latest collection of trendy clothing.
+                    </h2>
+                  </div>
+                  <button
+                    class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-[#1773cf] text-white text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em]"
+                  >
+                    <span class="truncate">View New Arrivals</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center justify-center p-4">
+              <a href="#" class="flex size-10 items-center justify-center">
+                <div class="text-[#111418]" data-icon="CaretLeft" data-size="18px" data-weight="regular">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"></path>
+                  </svg>
+                </div>
+              </a>
+              <a class="text-sm font-bold leading-normal tracking-[0.015em] flex size-10 items-center justify-center text-[#111418] rounded-full bg-[#f0f2f4]" href="#">1</a>
+              <a class="text-sm font-normal leading-normal flex size-10 items-center justify-center text-[#111418] rounded-full" href="#">2</a>
+              <a class="text-sm font-normal leading-normal flex size-10 items-center justify-center text-[#111418] rounded-full" href="#">3</a>
+              <a href="#" class="flex size-10 items-center justify-center">
+                <div class="text-[#111418]" data-icon="CaretRight" data-size="18px" data-weight="regular">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path>
+                  </svg>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

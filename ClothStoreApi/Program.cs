@@ -1,28 +1,41 @@
-using Microsoft.OpenApi.Models;
+using ClothStoreApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
+// Add services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
+builder.Services.AddSwaggerGen();
+
+// Register CustomerService
+builder.Services.AddSingleton<CustomerService>();
+
+// Enable CORS for React frontend
+builder.Services.AddCors(options =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "ClothStoreApi", Version = "v1" });
+    options.AddPolicy("AllowReact", policy =>
+    {
+        policy.WithOrigins(
+            "http://localhost:3000",
+            "https://staging.dpybw6tis10so.amplifyapp.com")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
 });
 
 var app = builder.Build();
 
-// Configure HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();      // <-- swagger middleware
-    app.UseSwaggerUI();    // <-- swagger UI
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseCors("AllowReact"); // Enable CORS
 
 app.UseAuthorization();
-
 app.MapControllers();
+
+
 
 app.Run();
