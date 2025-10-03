@@ -1,0 +1,2 @@
+regex:"ClientId"\s*:\s*".+"==>***REMOVED***
+regex:"ClientSecret"\s*:\s*".+"==>***REMOVED***

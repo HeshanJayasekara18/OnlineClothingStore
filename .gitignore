@@ -1,0 +1,89 @@
+# ========================
+# Visual Studio / .NET
+# ========================
+
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.DotSettings
+*.ncb
+*.opensdf
+*.sdf
+*.cachefile
+*.dbmdl
+*.bak
+*.log
+*.vspscc
+_ReSharper*/
+[Tt]humbs.db
+[Tt]humbcache_*.db
+*.DS_Store
+*.class
+*.dll
+*.exe
+*.pdb
+*.idb
+*.ipch
+*.obj
+*.o
+*.so
+*.swp
+*.tmp
+*.log
+*.vsix
+*.vscode/
+node_modules/
+bower_components/
+jspm_packages/
+
+# Build outputs
+bin/
+obj/
+out/
+artifacts/
+
+# Rider / IDE
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ASP.NET Core secrets
+secrets.json
+*.user.secrets.json
+
+# ASP.NET Core publish
+publish/
+*.Publish.xml
+
+# npm / frontend
+# ========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# React build output
+build/
+dist/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Optional: coverage reports
+coverage/
+*.lcov
+
+# Logs
+logs/
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
