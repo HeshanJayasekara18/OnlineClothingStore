@@ -25,6 +25,8 @@ out/
 
 # Secrets / local development
 appsettings.Development.json
+ClothStoreApi/appsettings.Development.json
+
 secrets.json
 *.pfx
 *.key
