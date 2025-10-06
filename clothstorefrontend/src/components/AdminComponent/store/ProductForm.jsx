@@ -73,10 +73,16 @@ const ProductForm = () => {
         ? `${API_URL}/api/products/${productId}`
         : `${API_URL}/api/products`;
 
+      // Remove id field for POST requests (MongoDB will auto-generate)
+      const productData = { ...product };
+      if (!productId) {
+        delete productData.id;
+      }
+
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(product),
+        body: JSON.stringify(productData),
       });
 
       if (response.ok) {

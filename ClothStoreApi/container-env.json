@@ -1,0 +1,18 @@
+[
+  {
+    "name": "DOTNET_RUNNING_IN_CONTAINER",
+    "value": "true"
+  },
+  {
+    "name": "ASPNETCORE_ENVIRONMENT",
+    "value": "Production"
+  },
+  {
+    "name": "MONGODB_CONNECTION_STRING",
+    "value": "mongodb+srv://jayasekaravithanageheshan_db_user:HM81764014jv@shoesstore.kud20ib.mongodb.net/?retryWrites=true&w=majority"
+  },
+  {
+    "name": "MONGODB_DATABASE_NAME",
+    "value": "ClothStoreDb"
+  }
+]

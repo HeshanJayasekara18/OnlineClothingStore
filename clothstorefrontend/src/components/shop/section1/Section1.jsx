@@ -23,21 +23,23 @@ export default function FashionStorePage() {
   // Fetch products from API
   useEffect(() => {
     const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`${API_URL}/api/products`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        try {
+          const response = await fetch(`${API_URL}/api/products`);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const responseData = await response.json();
+          // Handle wrapped response { success, count, data } or direct array
+          const data = responseData.data || responseData;
+          // Ensure data is an array
+          setAllProducts(Array.isArray(data) ? data : []);
+        } catch (err) {
+          setError(err.message || "Failed to load products.");
+          setAllProducts([]); // Set empty array on error
+        } finally {
+          setLoading(false);
         }
-        const data = await response.json();
-        setAllProducts(data);
-      } catch (err) {
-        setError(err.message || "Failed to load products.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
+      };
     fetchProducts();
   }, []);
 
@@ -71,6 +73,11 @@ export default function FashionStorePage() {
 
   // Filter and sort products
   const filteredAndSortedProducts = useMemo(() => {
+    // Ensure allProducts is an array before filtering
+    if (!Array.isArray(allProducts)) {
+      return [];
+    }
+    
     let filtered = allProducts.filter(product => {
       // Price filter
       if (product.price < priceRange[0] || product.price > priceRange[1]) return false;

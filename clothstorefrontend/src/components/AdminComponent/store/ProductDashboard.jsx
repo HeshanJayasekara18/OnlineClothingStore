@@ -33,10 +33,14 @@ const ProductDashboard = () => {
     try {
       const res = await fetch(API_URL);
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-      const data = await res.json();
-      setProducts(data);
+      const response = await res.json();
+      // Handle wrapped response { success, count, data } or direct array
+      const data = response.data || response;
+      // Ensure data is an array
+      setProducts(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Error fetching products", err);
+      setProducts([]); // Set empty array on error
     }
   };
 
@@ -45,20 +49,21 @@ const ProductDashboard = () => {
   }, []);
 
   // Filter + Search
-  const filteredProducts = products.filter((p) => {
-    return (
-      p.name?.toLowerCase().includes(search.toLowerCase()) &&
-      (filters.category ? p.category === filters.category : true) &&
-      (filters.color ? p.color === filters.color : true) &&
-      (filters.size ? p.size === filters.size : true) &&
-      (filters.gender ? p.gender === filters.gender : true)
-    );
-  });
+  const filteredProducts = Array.isArray(products)
+    ? products.filter((p) => {
+        return (
+          p.name?.toLowerCase().includes(search.toLowerCase()) &&
+          (filters.category ? p.category === filters.category : true) &&
+          (filters.color ? p.color === filters.color : true) &&
+          (filters.size ? p.size === filters.size : true) &&
+          (filters.gender ? p.gender === filters.gender : true)
+        );
+      })
+    : [];
 
   const handleAddProduct = () => {
     navigate("/admin-product-form");
   };
-
   const handleEditProduct = (id) => {
     navigate(`/admin-product-form?id=${id}`);
   };

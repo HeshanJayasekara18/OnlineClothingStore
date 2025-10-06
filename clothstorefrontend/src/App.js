@@ -22,7 +22,7 @@ function App() {
           <Route path="/shop" element={<Shop />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/assitant" element={<StyleAssistant />} />
-          <Route path="/auth/success" element={<GoogleCallbackHandler />} />
+          <Route path="/auth/callback" element={<GoogleCallbackHandler />} />
 
           <Route path="/admin-product-form" element={<ProductForm />} />
           <Route path="/admin-product-dashboard" element={<ProductDashboard />} />
