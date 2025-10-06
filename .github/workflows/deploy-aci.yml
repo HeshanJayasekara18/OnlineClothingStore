@@ -1,0 +1,109 @@
+name: Deploy to Azure Container Instances
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'ClothStoreApi/**'
+  workflow_dispatch:
+
+env:
+  ACR_NAME: clothstoreacr123
+  IMAGE_NAME: my-backend
+  RESOURCE_GROUP: myNewResourceGroup2
+  CONTAINER_NAME: my-backend-container
+  DNS_LABEL: my-backend-app2
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Build and push to ACR
+      working-directory: ./ClothStoreApi
+      run: |
+        az acr build --registry ${{ env.ACR_NAME }} \
+                     --image ${{ env.IMAGE_NAME }}:${{ github.sha }} \
+                     --image ${{ env.IMAGE_NAME }}:latest \
+                     --file Dockerfile .
+
+    - name: Delete existing container (if exists)
+      run: |
+        az container delete \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --name ${{ env.CONTAINER_NAME }} \
+          --yes || true
+
+    - name: Deploy to Azure Container Instances
+      run: |
+        az container create \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --name ${{ env.CONTAINER_NAME }} \
+          --image ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+          --cpu 1 \
+          --memory 1.5 \
+          --ports 8080 \
+          --dns-name-label ${{ env.DNS_LABEL }} \
+          --os-type Linux \
+          --registry-login-server ${{ env.ACR_NAME }}.azurecr.io \
+          --registry-username ${{ secrets.ACR_USERNAME }} \
+          --registry-password ${{ secrets.ACR_PASSWORD }} \
+          --restart-policy Always \
+          --environment-variables \
+            DOTNET_RUNNING_IN_CONTAINER=true \
+            ASPNETCORE_ENVIRONMENT=Production \
+            MONGODB_DATABASE_NAME=ClothStoreDb \
+          --secure-environment-variables \
+            MONGODB_CONNECTION_STRING=${{ secrets.MONGODB_CONNECTION_STRING }}
+
+    - name: Wait for container to start
+      run: |
+        echo "Waiting 20 seconds for container to start..."
+        sleep 20
+
+    - name: Get container details
+      run: |
+        FQDN=$(az container show \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --name ${{ env.CONTAINER_NAME }} \
+          --query ipAddress.fqdn -o tsv)
+        
+        RESTART_COUNT=$(az container show \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --name ${{ env.CONTAINER_NAME }} \
+          --query containers[0].instanceView.restartCount -o tsv)
+        
+        echo "Container FQDN: $FQDN"
+        echo "Restart Count: $RESTART_COUNT"
+        echo "API URL: http://$FQDN:8080"
+
+    - name: Show container logs
+      run: |
+        az container logs \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --name ${{ env.CONTAINER_NAME }}
+
+    - name: Verify deployment
+      run: |
+        FQDN=$(az container show \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --name ${{ env.CONTAINER_NAME }} \
+          --query ipAddress.fqdn -o tsv)
+        
+        echo "Testing health endpoint..."
+        curl -f http://$FQDN:8080/health || exit 1
+        echo "✓ Deployment successful!"
+
+    - name: Logout from Azure
+      run: az logout
+      if: always()
