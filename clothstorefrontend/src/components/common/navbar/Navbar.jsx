@@ -81,7 +81,7 @@ export default function Navbar() {
               Verve
             </h2>
           </div>
-          <nav className="flex items-center gap-6 lg:gap-9">
+          <nav className="flex items-center gap-6 lg:gap-9 ml-16">
             {navItems.map((item) => (
               <button
                 key={item.name}
