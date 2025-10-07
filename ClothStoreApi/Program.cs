@@ -86,6 +86,7 @@ builder.Services.AddScoped<IMongoDatabase>(sp =>
 });
 
 // -------------------- Application Services --------------------
+builder.Services.AddHttpClient(); // For Gemini API calls
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<CustomerService>();
 

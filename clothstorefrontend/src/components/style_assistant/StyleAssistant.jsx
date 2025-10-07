@@ -1,102 +1,165 @@
 import { useState } from "react";
 import axios from "axios";
+import { Sparkles, ShoppingBag } from "lucide-react";
 
 const API_URL = (process.env.REACT_APP_API_URL || "").trim();
 
 export default function StylistForm() {
-  const [form, setForm] = useState({
-    occasion: "",
-    size: "",
-    favoriteColor: "",
-    gender: "",
-    budget: ""
-  });
-
+  const [prompt, setPrompt] = useState("");
   const [suggestion, setSuggestion] = useState(null);
-  const [storeProducts, setStoreProducts] = useState([]);
+  const [availableProducts, setAvailableProducts] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!prompt.trim()) {
+      alert("Please describe your situation!");
+      return;
+    }
+
     setLoading(true);
-    setStoreProducts([]);
+    setSuggestion(null);
+    setAvailableProducts([]);
+    
     try {
-      const res = await axios.post(`${API_URL}/api/stylist/suggest`, form);
-      setSuggestion(res.data);
+      const res = await axios.post(`${API_URL}/api/stylist/suggest-with-products`, {
+        prompt: prompt
+      });
+      setSuggestion(res.data.suggestion);
+      setAvailableProducts(res.data.availableProducts || []);
     } catch (err) {
       console.error(err);
-      alert("Something went wrong. Check API logs.");
+      alert(err.response?.data?.error || "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  const showStoreProducts = async () => {
-    if (!suggestion?.filter) return;
-    setLoading(true);
-    try {
-      const { category, color } = suggestion.filter;
-      const res = await axios.get(`${API_URL}/api/stylist/store`, {
-        params: { category, color }
-      });
-      setStoreProducts(res.data);
-    } catch (err) {
-      console.error(err);
-      alert("Failed to fetch products from store.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const examplePrompts = [
+    "I have a birthday party this weekend and I want to look elegant. My size is XL.",
+    "I need casual wear for a coffee date. I prefer blue colors and my size is M.",
+    "Looking for professional office wear, size L, budget around $100.",
+    "I'm going to a beach vacation, need comfortable summer clothes, size S."
+  ];
 
   return (
-    <div className="max-w-2xl mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">AI Fashion Stylist</h2>
-      
-      <form onSubmit={handleSubmit} className="grid gap-3">
-        {["occasion","size","favoriteColor","gender","budget"].map(field => (
-          <input
-            key={field}
-            type="text"
-            name={field}
-            placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-            value={form[field]}
-            onChange={handleChange}
-            className="p-2 border rounded"
-          />
-        ))}
-
-        <button type="submit" disabled={loading} className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
-          {loading ? "Suggesting..." : "Get Suggestions"}
-        </button>
-      </form>
-
-      {suggestion && (
-        <div className="mt-6 p-4 border rounded shadow">
-          <p className="text-lg">{suggestion.suggestion}</p>
-          <button
-            className="mt-3 bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700"
-            onClick={showStoreProducts}
-          >
-            Show from Store
-          </button>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 py-12 px-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Sparkles className="w-8 h-8 text-purple-600" />
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              AI Fashion Stylist
+            </h1>
+          </div>
+          <p className="text-gray-600 text-lg">
+            Describe your situation and get personalized style recommendations
+          </p>
         </div>
-      )}
 
-      {storeProducts.length > 0 && (
-        <div className="mt-6 space-y-4">
-          {storeProducts.map(p => (
-            <div key={p.id} className="p-4 border rounded shadow">
-              <h3 className="font-bold text-lg">{p.name}</h3>
-              <p>{p.description}</p>
-              <p><b>Price:</b> ${p.price}</p>
-              <p><b>Color:</b> {p.color}</p>
-              <img src={p.imageUrl} alt={p.name} className="mt-2 w-32 h-32 object-cover" />
+        {/* Main Form */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Tell us about your situation
+              </label>
+              <textarea
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder="Example: I have a birthday party this weekend and I want to look elegant. My size is XL and I prefer dark colors..."
+                rows={5}
+                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all resize-none"
+              />
             </div>
-          ))}
+
+            {/* Example Prompts */}
+            <div>
+              <p className="text-sm font-medium text-gray-600 mb-2">Try these examples:</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {examplePrompts.map((example, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setPrompt(example)}
+                    className="text-left text-sm p-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors text-gray-700"
+                  >
+                    {example}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 px-6 rounded-xl font-semibold text-lg hover:from-purple-700 hover:to-pink-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  Getting Suggestions...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-5 h-5" />
+                  Get Style Suggestions
+                </>
+              )}
+            </button>
+          </form>
         </div>
-      )}
+
+        {/* AI Suggestion */}
+        {suggestion && (
+          <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 animate-fade-in">
+            <div className="flex items-start gap-3 mb-4">
+              <Sparkles className="w-6 h-6 text-purple-600 mt-1 flex-shrink-0" />
+              <div>
+                <h3 className="text-xl font-bold text-gray-800 mb-3">Your Personalized Style Recommendation</h3>
+                <div className="text-gray-700 leading-relaxed whitespace-pre-line">
+                  {suggestion}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Available Products */}
+        {availableProducts.length > 0 && (
+          <div className="bg-white rounded-2xl shadow-xl p-8">
+            <div className="flex items-center gap-2 mb-6">
+              <ShoppingBag className="w-6 h-6 text-purple-600" />
+              <h3 className="text-2xl font-bold text-gray-800">Available in Our Store</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {availableProducts.map((product) => (
+                <div
+                  key={product.id}
+                  className="border-2 border-gray-200 rounded-xl p-4 hover:border-purple-400 hover:shadow-lg transition-all"
+                >
+                  {product.imageUrl && (
+                    <img
+                      src={product.imageUrl}
+                      alt={product.name}
+                      className="w-full h-48 object-cover rounded-lg mb-4"
+                    />
+                  )}
+                  <h4 className="font-bold text-lg text-gray-800 mb-2">{product.name}</h4>
+                  <p className="text-sm text-gray-600 mb-3">{product.description}</p>
+                  <div className="space-y-1 text-sm">
+                    <p><span className="font-semibold">Category:</span> {product.category}</p>
+                    <p><span className="font-semibold">Color:</span> {product.color}</p>
+                    <p><span className="font-semibold">Size:</span> {product.size}</p>
+                    <p className="text-lg font-bold text-purple-600 mt-2">${product.price}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

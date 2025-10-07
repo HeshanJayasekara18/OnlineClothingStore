@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, ShoppingBag, Star, ArrowRight } from 'lucide-react';
 import Navbar from '../common/navbar/Navbar';
+import img1 from '../common/images/img1.jpg';
+import img2 from '../common/images/img2.jpg';
+import img3 from '../common/images/img3.jpg';
+
+
 
 
 export default function ClothingStoreLanding() {
@@ -8,22 +13,22 @@ export default function ClothingStoreLanding() {
 
   const slides = [
     {
-      image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1200&h=600&fit=crop',
+      image: img2,
       title: 'New Summer Collection',
       subtitle: 'Discover the latest trends'
     },
     {
-      image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&h=600&fit=crop',
+      image: img1,
       title: 'Elegant Styles',
       subtitle: 'Timeless fashion for every occasion'
     },
     {
-      image: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=1200&h=600&fit=crop',
+      image: 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=1200&h=600&fit=crop',
       title: 'Urban Streetwear',
       subtitle: 'Express your unique style'
     },
     {
-      image: 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=1200&h=600&fit=crop',
+      image: img3,
       title: 'Premium Quality',
       subtitle: 'Crafted with care and precision'
     },
@@ -149,7 +154,9 @@ export default function ClothingStoreLanding() {
                 <p className="text-xl md:text-2xl text-gray-200 mb-8">
                   {slide.subtitle}
                 </p>
-                <button className="bg-white text-gray-900 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transition-all transform hover:scale-105 shadow-2xl">
+
+                <button className="bg-white text-gray-900 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transition-all transform hover:scale-105 shadow-2xl"
+                onClick={() => window.location.href = '/shop'}>
                   Shop Now
                 </button>
               </div>
@@ -193,7 +200,8 @@ export default function ClothingStoreLanding() {
               <h2 className="text-4xl font-bold text-gray-900 mb-2">Men's Collection</h2>
               <p className="text-gray-600">Sophisticated styles for modern gentlemen</p>
             </div>
-            <button className="flex items-center gap-2 text-purple-600 font-semibold hover:gap-4 transition-all">
+            <button className="flex items-center gap-2 text-purple-600 font-semibold hover:gap-4 transition-all"
+            onClick={() => window.location.href = '/shop'}>
               View All <ArrowRight size={20} />
             </button>
           </div>
@@ -213,7 +221,8 @@ export default function ClothingStoreLanding() {
               <h2 className="text-4xl font-bold text-gray-900 mb-2">Women's Collection</h2>
               <p className="text-gray-600">Elegant fashion for every woman</p>
             </div>
-            <button className="flex items-center gap-2 text-purple-600 font-semibold hover:gap-4 transition-all">
+            <button className="flex items-center gap-2 text-purple-600 font-semibold hover:gap-4 transition-all"
+            onClick={() => window.location.href = '/shop'}>
               View All <ArrowRight size={20} />
             </button>
           </div>
@@ -248,7 +257,8 @@ export default function ClothingStoreLanding() {
               <h2 className="text-4xl font-bold text-gray-900 mb-2">Kids Collection</h2>
               <p className="text-gray-600">Comfortable and playful styles for little ones</p>
             </div>
-            <button className="flex items-center gap-2 text-purple-600 font-semibold hover:gap-4 transition-all">
+            <button className="flex items-center gap-2 text-purple-600 font-semibold hover:gap-4 transition-all"
+            onClick={() => window.location.href = '/shop'}>
               View All <ArrowRight size={20} />
             </button>
           </div>
