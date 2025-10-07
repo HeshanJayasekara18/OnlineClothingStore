@@ -235,7 +235,7 @@ export default function ClothingStoreLanding() {
       </section>
 
       {/* Latest Designs */}
-      <section className="py-20 px-4 bg-gradient-to-br from-purple-900 via-pink-900 to-purple-900">
+      <section className="py-20 px-4 bg-gradient-to-br from-green-100 via-green-500 to-green-900">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Latest Designs</h2>
@@ -306,7 +306,7 @@ export default function ClothingStoreLanding() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-center">
+      <section className="py-20 px-4 bg-gradient-to-r from-green-600 to-green-600 text-white text-center">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             Join Our Fashion Community
