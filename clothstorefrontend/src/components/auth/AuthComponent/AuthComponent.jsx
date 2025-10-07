@@ -4,6 +4,7 @@ import { Eye, EyeOff, Home, Shirt } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import img8 from '../../common/images/img8.jpg';
+import LoadingScreen from '../../common/LoadingScreen/LoadingScreen';
 
 export default function AuthComponent({ onLogin }) {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -12,6 +13,7 @@ export default function AuthComponent({ onLogin }) {
   const [formData, setFormData] = useState({ email: '', password: '', confirmPassword: '', firstName: '', lastName: '', phone: '' });
   const [loggedUser, setLoggedUser] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showLoadingScreen, setShowLoadingScreen] = useState(false);
 
   const navigate = useNavigate();
   const API_URL = process.env.REACT_APP_API_URL || "https://clothstoreapiapp.azurewebsites.net";
@@ -109,7 +111,12 @@ export default function AuthComponent({ onLogin }) {
         setLoggedUser(user);
         localStorage.setItem("loggedUser", JSON.stringify(user));
         if (onLogin) onLogin(user);
-        navigate("/home");
+        
+        // Show loading screen before navigation
+        setShowLoadingScreen(true);
+        setTimeout(() => {
+          navigate("/home");
+        }, 3000); // 3 second loading animation
       } catch (err) { 
         alert(err.message || "Error logging in"); 
       }
@@ -143,7 +150,12 @@ export default function AuthComponent({ onLogin }) {
       setLoggedUser(user);
       localStorage.setItem("loggedUser", JSON.stringify(user));
       if (onLogin) onLogin(user);
-      navigate("/home");
+      
+      // Show loading screen before navigation
+      setShowLoadingScreen(true);
+      setTimeout(() => {
+        navigate("/home");
+      }, 3000); // 3 second loading animation
     } catch (err) { 
       alert(err.message || "Google login failed"); 
     }
@@ -167,6 +179,11 @@ export default function AuthComponent({ onLogin }) {
     setIsSignUp(!isSignUp);
     setFormData({ email: '', password: '', confirmPassword: '', firstName: '', lastName: '', phone: '' });
   };
+
+  // Show loading screen after successful login
+  if (showLoadingScreen) {
+    return <LoadingScreen />;
+  }
 
   if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="text-xl">Loading...</div></div>;
   
