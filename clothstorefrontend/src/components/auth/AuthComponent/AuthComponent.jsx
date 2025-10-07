@@ -14,7 +14,7 @@ export default function AuthComponent({ onLogin }) {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+  const API_URL = process.env.REACT_APP_API_URL || "https://clothstoreapiapp.azurewebsites.net";
   const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || "337988956225-np362jqlp8nhscqq76hmbsqfh3fjsvme.apps.googleusercontent.com";
 
   // -------------------- Persistent login --------------------

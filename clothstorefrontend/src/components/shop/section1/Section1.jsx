@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import img7 from '../../common/images/img7.jpg';
 
-const API_URL = (process.env.REACT_APP_API_URL || "").trim();
+const API_URL = (process.env.REACT_APP_API_URL || "https://clothstoreapiapp.azurewebsites.net").trim();
 
 export default function FashionStorePage() {
   const [selectedSort, setSelectedSort] = useState('featured');

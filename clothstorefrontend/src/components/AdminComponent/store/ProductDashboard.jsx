@@ -25,7 +25,7 @@ const ProductDashboard = () => {
   const [viewMode, setViewMode] = useState("grid");
   const navigate = useNavigate();
 
-  const API_URLL = (process.env.REACT_APP_API_URL || "").trim();
+  const API_URLL = (process.env.REACT_APP_API_URL || "https://clothstoreapiapp.azurewebsites.net").trim();
   const API_URL = `${API_URLL}/api/products`;
 
   // Fetch products

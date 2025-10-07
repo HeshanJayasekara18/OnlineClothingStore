@@ -18,7 +18,7 @@ const ProductForm = () => {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const API_URL = (process.env.REACT_APP_API_URL || "").trim();
+  const API_URL = (process.env.REACT_APP_API_URL || "https://clothstoreapiapp.azurewebsites.net").trim();
 
   const useQuery = () => new URLSearchParams(useLocation().search);
   const query = useQuery();
