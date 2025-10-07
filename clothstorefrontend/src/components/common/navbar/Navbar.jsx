@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import {Shirt ,profile } from 'lucide-react';
+import { User } from 'lucide-react';
 
 
 export default function Navbar() {
@@ -101,10 +101,16 @@ export default function Navbar() {
         <div className="flex items-center gap-4">
           {firstName ? (
             <>
-              
               <span className="text-[#111418] text-sm font-medium">
                 Hello, {firstName} 👋
               </span>
+              <button
+                onClick={() => navigate("/profile")}
+                className="flex items-center justify-center w-9 h-9 rounded-full bg-[#1773cf] hover:bg-[#0f5a99] transition-colors"
+                title="View Profile"
+              >
+                <User className="w-5 h-5 text-white" />
+              </button>
               <button
                 onClick={handleLogout}
                 className="text-[#1773cf] hover:text-[#0f5a99] text-sm font-medium"
@@ -173,8 +179,19 @@ export default function Navbar() {
         <div className="md:hidden bg-white border-t border-[#f0f2f4] px-4 py-2">
           <div className="border-b border-[#f0f2f4] pb-3 mb-3">
             {firstName ? (
-              <div className="text-[#111418] text-sm font-medium py-2">
-                Hello, {firstName} 👋
+              <div className="flex items-center justify-between py-2">
+                <div className="text-[#111418] text-sm font-medium">
+                  Hello, {firstName} 👋
+                </div>
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    navigate("/profile");
+                  }}
+                  className="flex items-center justify-center w-8 h-8 rounded-full bg-[#1773cf] hover:bg-[#0f5a99] transition-colors"
+                >
+                  <User className="w-4 h-4 text-white" />
+                </button>
               </div>
             ) : (
               <button

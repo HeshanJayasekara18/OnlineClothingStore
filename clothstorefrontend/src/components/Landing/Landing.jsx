@@ -131,7 +131,7 @@ export default function ClothingStoreLanding() {
           <Navbar/>
 
       {/* Hero Slider Section */}
-      <div className="relative h-screen overflow-hidden">
+      <div className="relative h-screen overflow-hidden mt-16">
         {slides.map((slide, index) => (
           <div
             key={index}
