@@ -7,15 +7,16 @@ using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// -------------------- Kestrel Configuration --------------------
+// -------------------- Kestrel Configuration for Docker --------------------
 bool isDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER")?.ToLower() == "true";
+var port = Environment.GetEnvironmentVariable("PORT") ?? "80"; // Azure automatically sets this
 
 if (isDocker)
 {
     builder.WebHost.ConfigureKestrel(options =>
     {
-        options.ListenAnyIP(80);   // HTTP inside container
-        options.ListenAnyIP(8080); // Optional extra port if needed
+        options.ListenAnyIP(80);
+        options.ListenAnyIP(8080); // optional
     });
 }
 
@@ -35,31 +36,39 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins(
-                "http://localhost:3000",
-                "https://localhost:3000"
-            )
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials()
-            .WithExposedHeaders("Location");
+        policy.SetIsOriginAllowed(origin =>
+              {
+                  // Allow localhost for development
+                  if (origin.StartsWith("http://localhost:") || origin.StartsWith("https://localhost:"))
+                      return true;
+                  
+                  // Allow all Vercel deployments
+                  if (origin.EndsWith(".vercel.app"))
+                      return true;
+                  
+                  return false;
+              })
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials()
+              .WithExposedHeaders("Location");
     });
 });
 
 // -------------------- MongoDB --------------------
-// Support both appsettings.json and environment variables
-var mongoConnectionString = Environment.GetEnvironmentVariable("MONGODB_CONNECTION_STRING") 
+var mongoConnectionString = Environment.GetEnvironmentVariable("MongoDbSettings__ConnectionString") 
     ?? builder.Configuration["MongoDbSettings:ConnectionString"];
-var mongoDatabaseName = Environment.GetEnvironmentVariable("MONGODB_DATABASE_NAME") 
-    ?? builder.Configuration["MongoDbSettings:DatabaseName"];
+var mongoDatabaseName = Environment.GetEnvironmentVariable("MongoDbSettings__DatabaseName") 
+    ?? builder.Configuration["MongoDbSettings:DatabaseName"] 
+    ?? "ClothStoreDb";
 
 if (string.IsNullOrEmpty(mongoConnectionString))
-    throw new InvalidOperationException("MongoDB ConnectionString is not configured. Set MONGODB_CONNECTION_STRING environment variable or MongoDbSettings:ConnectionString in appsettings.json");
+    throw new InvalidOperationException("MongoDB ConnectionString is not configured.");
 
 builder.Services.Configure<MongoDbSettings>(options =>
 {
     options.ConnectionString = mongoConnectionString;
-    options.DatabaseName = mongoDatabaseName ?? "ClothStoreDb";
+    options.DatabaseName = mongoDatabaseName;
 });
 
 builder.Services.AddSingleton<IMongoClient>(sp =>
@@ -81,6 +90,11 @@ builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<CustomerService>();
 
 // -------------------- Authentication --------------------
+var googleClientId = Environment.GetEnvironmentVariable("Authentication__Google__ClientId") 
+                     ?? builder.Configuration["Authentication:Google:ClientId"];
+var googleClientSecret = Environment.GetEnvironmentVariable("Authentication__Google__ClientSecret") 
+                         ?? builder.Configuration["Authentication:Google:ClientSecret"];
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -88,68 +102,63 @@ builder.Services.AddAuthentication(options =>
 .AddCookie()
 .AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
 {
-    options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+    if (string.IsNullOrEmpty(googleClientId) || string.IsNullOrEmpty(googleClientSecret))
+        Console.WriteLine("Warning: Google OAuth ClientId or ClientSecret is missing!");
+
+    options.ClientId = googleClientId;
+    options.ClientSecret = googleClientSecret;
     options.CallbackPath = "/signin-google";
 });
 
+// -------------------- OpenAI & Gemini Settings --------------------
+builder.Services.Configure<OpenAISettings>(builder.Configuration.GetSection("OpenAI"));
+builder.Services.Configure<GeminiSettings>(builder.Configuration.GetSection("Gemini"));
+
+// -------------------- Build App --------------------
 var app = builder.Build();
 
 // -------------------- Middleware --------------------
-if (app.Environment.IsDevelopment())
+// Enable Swagger in all environments (including Production for Azure)
+app.UseSwagger();
+app.UseSwaggerUI(c => 
 {
-    
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "ClothStore API V1");
-    });
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "ClothStore API V1");
+    c.RoutePrefix = "swagger"; // Access at /swagger
+});
 
-}
-
-// Avoid redirecting CORS preflight (OPTIONS) in development
-// Only force HTTPS redirection in Production or when running behind a proxy that terminates TLS
 if (!isDocker && app.Environment.IsProduction())
 {
     app.UseHttpsRedirection();
 }
 
 app.UseRouting();
-
-// CORS must be placed between UseRouting and UseAuthorization
 app.UseCors("AllowAll");
-
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
 // -------------------- Health & Test Endpoints --------------------
-app.MapGet("/", () =>
+app.MapGet("/", () => Results.Json(new
 {
-    return Results.Json(new
-    {
-        message = "ClothStore API is running!",
-        status = "Healthy",
-        timestamp = DateTime.UtcNow,
-        environment = app.Environment.EnvironmentName,
-        os = System.Runtime.InteropServices.RuntimeInformation.OSDescription
-    });
-});
+    message = "ClothStore API is running!",
+    status = "Healthy",
+    timestamp = DateTime.UtcNow,
+    environment = app.Environment.EnvironmentName,
+    os = System.Runtime.InteropServices.RuntimeInformation.OSDescription
+}));
 
 app.MapGet("/health", () => "Healthy");
 app.MapGet("/test", () => "Test endpoint is working!");
 
 // MongoDB test endpoint
-app.MapGet("/test-mongodb", async (IMongoClient mongoClient, IConfiguration configuration) =>
+app.MapGet("/test-mongodb", async (IMongoClient mongoClient) =>
 {
     try
     {
-        var databaseName = configuration["MongoDbSettings:DatabaseName"];
-        var database = mongoClient.GetDatabase(databaseName);
+        var database = mongoClient.GetDatabase(mongoDatabaseName);
         await database.RunCommandAsync<MongoDB.Bson.BsonDocument>(new MongoDB.Bson.BsonDocument("ping", 1));
-
-        return Results.Ok(new { status = "MongoDB connected successfully", database = databaseName });
+        return Results.Ok(new { status = "MongoDB connected successfully", database = mongoDatabaseName });
     }
     catch (Exception ex)
     {
