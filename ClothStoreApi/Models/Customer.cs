@@ -16,5 +16,9 @@ namespace ClothStoreApi.Models
         public string Password { get; set; } = null!;
         public string? Phone { get; set; }
         public string? Picture { get; set; }
+        
+        // Password Reset Fields
+        public string? ResetCode { get; set; }
+        public DateTime? ResetCodeExpiry { get; set; }
     }
 }

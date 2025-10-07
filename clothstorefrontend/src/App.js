@@ -7,6 +7,8 @@ import Shop from './components/shop/Shop'
 import Auth from './components/auth/AuthComponent/AuthComponent';
 import StyleAssistant from './components/style_assistant/StyleAssistant';
 import UserProfile from './components/UserProfile/UserProfile';
+import ForgotPassword from './components/auth/ForgotPassword/ForgotPassword';
+import ResetPassword from './components/auth/ResetPassword/ResetPassword';
 
 import ProductForm from './components/AdminComponent/store/ProductForm';
 import ProductDashboard from './components/AdminComponent/store/ProductDashboard';
@@ -24,6 +26,8 @@ function App() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/assitant" element={<StyleAssistant />} />
           <Route path="/profile" element={<UserProfile />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/auth/callback" element={<GoogleCallbackHandler />} />
 
           <Route path="/admin-product-form" element={<ProductForm />} />

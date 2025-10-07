@@ -311,6 +311,18 @@ export default function AuthComponent({ onLogin }) {
                 </button>
               </div>
 
+              {/* Forgot Password Link */}
+              {!isSignUp && (
+                <div className="text-center mt-3">
+                  <button 
+                    onClick={() => navigate('/forgot-password')}
+                    className="text-sm text-blue-600 hover:text-blue-700 hover:underline"
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
+              )}
+
               <div className="text-center mt-4 text-sm text-gray-600">
                 {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
                 <button onClick={toggleMode} className="text-emerald-600 hover:text-emerald-700">

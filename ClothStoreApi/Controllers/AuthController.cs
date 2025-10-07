@@ -158,7 +158,6 @@ namespace ClothStoreApi.Controllers
                     user.Id,
                     user.FirstName,
                     user.LastName,
-                    user.Email,
                     user.Picture
                 });
             }
@@ -169,9 +168,141 @@ namespace ClothStoreApi.Controllers
             }
         }
 
+        // -------------------- Forgot Password --------------------
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+        {
+            try
+            {
+                var user = await _customerService.GetByEmailAsync(request.Email);
+                if (user == null)
+                {
+                    // Don't reveal if email exists or not for security
+                    return Ok(new { message = "If the email exists, a reset code has been sent." });
+                }
+
+                // Generate 6-digit code
+                var resetCode = new Random().Next(100000, 999999).ToString();
+                
+                // Set expiry to 15 minutes from now
+                user.ResetCode = resetCode;
+                user.ResetCodeExpiry = DateTime.UtcNow.AddMinutes(15);
+                
+                await _customerService.UpdateAsync(user.Id!, user);
+
+                // In production, send email here
+                // For now, log it (you can see it in console)
+                _logger.LogInformation("Password reset code for {Email}: {Code}", request.Email, resetCode);
+                
+                // TODO: Send email with reset code
+                // await _emailService.SendResetCodeAsync(request.Email, resetCode);
+
+                return Ok(new { 
+                    message = "Reset code sent to your email",
+                    // Remove this in production - only for testing
+                    code = resetCode 
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in forgot password");
+                return StatusCode(500, "An error occurred");
+            }
+        }
+
+        // -------------------- Verify Reset Code --------------------
+        [HttpPost("verify-reset-code")]
+        public async Task<IActionResult> VerifyResetCode([FromBody] VerifyCodeRequest request)
+        {
+            try
+            {
+                var user = await _customerService.GetByEmailAsync(request.Email);
+                if (user == null || string.IsNullOrEmpty(user.ResetCode))
+                {
+                    return BadRequest(new { message = "Invalid request" });
+                }
+
+                // Check if code matches and hasn't expired
+                if (user.ResetCode != request.Code)
+                {
+                    return BadRequest(new { message = "Invalid reset code" });
+                }
+
+                if (user.ResetCodeExpiry < DateTime.UtcNow)
+                {
+                    return BadRequest(new { message = "Reset code has expired" });
+                }
+
+                return Ok(new { message = "Code verified successfully" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error verifying reset code");
+                return StatusCode(500, "An error occurred");
+            }
+        }
+
+        // -------------------- Reset Password --------------------
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+        {
+            try
+            {
+                var user = await _customerService.GetByEmailAsync(request.Email);
+                if (user == null || string.IsNullOrEmpty(user.ResetCode))
+                {
+                    return BadRequest(new { message = "Invalid request" });
+                }
+
+                // Verify code again
+                if (user.ResetCode != request.Code || user.ResetCodeExpiry < DateTime.UtcNow)
+                {
+                    return BadRequest(new { message = "Invalid or expired reset code" });
+                }
+
+                // Update password (stored as plain text in current implementation)
+                // TODO: In production, hash the password using BCrypt or similar
+                user.Password = request.NewPassword;
+                
+                // Clear reset code
+                user.ResetCode = null;
+                user.ResetCodeExpiry = null;
+                
+                await _customerService.UpdateAsync(user.Id!, user);
+
+                _logger.LogInformation("Password reset successful for {Email}", request.Email);
+
+                return Ok(new { message = "Password reset successfully" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error resetting password");
+                return StatusCode(500, "An error occurred");
+            }
+        }
+
+        // -------------------- Request Models --------------------
         public class TokenRequest
         {
             public string Token { get; set; } = null!;
+        }
+
+        public class ForgotPasswordRequest
+        {
+            public string Email { get; set; } = null!;
+        }
+
+        public class VerifyCodeRequest
+        {
+            public string Email { get; set; } = null!;
+            public string Code { get; set; } = null!;
+        }
+
+        public class ResetPasswordRequest
+        {
+            public string Email { get; set; } = null!;
+            public string Code { get; set; } = null!;
+            public string NewPassword { get; set; } = null!;
         }
     }
 }
