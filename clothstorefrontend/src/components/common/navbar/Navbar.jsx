@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import {Shirt ,profile } from 'lucide-react';
+
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("Flash Sale");
+  const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [firstName, setFirstName] = useState(null);
 
@@ -15,6 +17,17 @@ export default function Navbar() {
     { name: "Men", href: "/home" },
     { name: "Assistant", href: "/assitant" },
   ];
+
+  // Determine active tab based on current route
+  const getActiveTab = () => {
+    const path = location.pathname;
+    if (path === "/shop") return "Store";
+    if (path === "/assitant") return "Assistant";
+    if (path === "/home") return "Home";
+    return "Home"; // default
+  };
+
+  const activeTab = getActiveTab();
 
   // Update user from localStorage
   useEffect(() => {
@@ -37,8 +50,7 @@ export default function Navbar() {
     return () => window.removeEventListener("storage", updateUser);
   }, []);
 
-  const handleTabClick = (tabName, href) => {
-    setActiveTab(tabName);
+  const handleTabClick = (href) => {
     setIsMobileMenuOpen(false);
     navigate(href);
   };
@@ -55,25 +67,18 @@ export default function Navbar() {
   };
 
   return (
-    <header className="border-b border-solid border-b-[#f0f2f4]">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-solid border-b-[#f0f2f4] shadow-sm">
       {/* Desktop Navbar */}
       <div className="hidden md:flex items-center justify-between px-6 lg:px-10 py-3">
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-4 text-[#111418]">
             <div className="size-4">
-              <svg
-                viewBox="0 0 48 48"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M13.8261 30.5736C16.7203 29.8826 20.2244 29.4783 24 29.4783C27.7756 29.4783 31.2797 29.8826 34.1739 30.5736C36.9144 31.2278 39.9967 32.7669 41.3563 33.8352L24.8486 7.36089C24.4571 6.73303 23.5429 6.73303 23.1514 7.36089L6.64374 33.8352C8.00331 32.7669 11.0856 31.2278 13.8261 30.5736Z"
-                  fill="currentColor"
-                />
-              </svg>
+              
             </div>
-            <h2 className="text-[#111418] text-lg font-bold leading-tight tracking-[-0.015em]">
-              Fashion Hub
+
+            
+            <h2 className="text-[#228d0f] text-3xl font-bold leading-tight tracking-[-0.015em]">
+              Verve
             </h2>
           </div>
           <nav className="flex items-center gap-6 lg:gap-9">
@@ -85,7 +90,7 @@ export default function Navbar() {
                     ? "text-[#1773cf] font-semibold border-b-2 border-[#1773cf] pb-1"
                     : "text-[#111418] hover:text-[#1773cf]"
                 }`}
-                onClick={() => handleTabClick(item.name, item.href)}
+                onClick={() => handleTabClick(item.href)}
               >
                 {item.name}
               </button>
@@ -96,6 +101,7 @@ export default function Navbar() {
         <div className="flex items-center gap-4">
           {firstName ? (
             <>
+              
               <span className="text-[#111418] text-sm font-medium">
                 Hello, {firstName} 👋
               </span>
@@ -121,7 +127,7 @@ export default function Navbar() {
       <div className="md:hidden flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-3 text-[#111418]">
           <h2 className="text-[#111418] text-base font-bold leading-tight tracking-[-0.015em]">
-            Fashion Hub
+            Verve
           </h2>
         </div>
 
@@ -188,7 +194,7 @@ export default function Navbar() {
                     ? "text-[#1773cf] font-semibold bg-[#f0f8ff]"
                     : "text-[#111418] hover:text-[#1773cf] hover:bg-[#f8f9fa]"
                 }`}
-                onClick={() => handleTabClick(item.name, item.href)}
+                onClick={() => handleTabClick(item.href)}
               >
                 {item.name}
               </button>

@@ -120,20 +120,14 @@ const ProductForm = () => {
     } catch (error) {
       console.error("Error:", error);
       setMessage("⚠️ Error connecting to server.");
-    } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div
-      className="min-h-screen p-4"
-      style={{
-        background:
-          "linear-gradient(135deg, #2D3561 0%, #7B9EA8 50%, #A8C5C1 100%)",
-      }}
-    >
-      <div className="max-w-4xl mx-auto">
+    <div>
+      <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 py-12 px-4">
+        <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8 pt-8">
           <h1 className="text-4xl font-bold mb-2" style={{ color: "#F5F7F5" }}>
@@ -357,6 +351,7 @@ const ProductForm = () => {
           <p style={{ color: "#A8C5C1" }}>
             Building your fashion empire, one product at a time ✨
           </p>
+        </div>
         </div>
       </div>
     </div>

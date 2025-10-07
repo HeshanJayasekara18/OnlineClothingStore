@@ -188,7 +188,8 @@ export default function AuthComponent({ onLogin }) {
               <div className="w-10 h-10 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl flex items-center justify-center">
                 <Shirt className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Clothey</span>
+              <span className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Verve</span>
+              
             </div>
             <button onClick={() => navigate("/home")} className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-emerald-600 transition-colors duration-200 rounded-lg hover:bg-gray-50">
               <Home className="w-4 h-4" />
@@ -200,7 +201,7 @@ export default function AuthComponent({ onLogin }) {
           <div className="flex-1 flex flex-col items-center justify-center px-6">
             <div className="w-full max-w-md">
               <div className="text-center mb-6">
-                <h1 className="text-3xl font-bold text-black mb-2">{isSignUp ? 'Join Our Fashion Community' : 'Welcome Back, Clothey'}</h1>
+                <h1 className="text-3xl font-bold text-black mb-2">{isSignUp ? 'Join Our Fashion Community' : 'Welcome Back, Verve.'}</h1>
                 <p className="text-gray-700">{isSignUp ? 'Discover your style, define your story' : 'Sign in to continue your fashion journey'}</p>
               </div>
 

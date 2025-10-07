@@ -87,14 +87,15 @@ const ProductDashboard = () => {
   };
 
   return (
-    <div
-      className="min-h-screen"
-      style={{
-        background:
-          "linear-gradient(135deg, #2D3561 0%, #7AA5A3 50%, #B8D8D1 100%)",
-      }}
-    >
-      <div className="max-w-7xl mx-auto px-6 py-8">
+    <div>
+      <div
+        className="min-h-screen"
+        style={{
+          background:
+            "linear-gradient(135deg, #2D3561 0%, #7AA5A3 50%, #B8D8D1 100%)",
+        }}
+      >
+        <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-4">
@@ -403,9 +404,10 @@ const ProductDashboard = () => {
             )}
           </div>
         )}
+        </div>
       </div>
     </div>
   );
-};
+}
 
 export default ProductDashboard;
