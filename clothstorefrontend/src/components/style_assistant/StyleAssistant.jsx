@@ -1,54 +1,87 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import axios from "axios";
-import { Sparkles, ShoppingBag } from "lucide-react";
+import { Sparkles, Send } from "lucide-react";
 import Navbar from "../common/navbar/Navbar";
 
 const API_URL = (process.env.REACT_APP_API_URL || "https://clothstoreapiapp.azurewebsites.net").trim();
 
-export default function StylistForm() {
-  const [prompt, setPrompt] = useState("");
-  const [suggestion, setSuggestion] = useState(null);
-  const [availableProducts, setAvailableProducts] = useState([]);
+export default function StyleAssistant() {
+  const [input, setInput] = useState("");
+  const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const chatBodyRef = useRef(null);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!prompt.trim()) {
-      alert("Please describe your situation!");
+  useEffect(() => {
+    const chatBody = chatBodyRef.current;
+    if (chatBody) {
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+  }, [messages, loading]);
+
+  const sendMessage = async () => {
+    const trimmed = input.trim();
+    if (!trimmed || loading) {
       return;
     }
 
+    const userMessage = {
+      role: "user",
+      content: trimmed
+    };
+
+    const conversation = [...messages, userMessage];
+    setMessages(conversation);
+    setInput("");
     setLoading(true);
-    setSuggestion(null);
-    setAvailableProducts([]);
-    
+
     try {
-      const res = await axios.post(`${API_URL}/api/stylist/suggest-with-products`, {
-        prompt: prompt
+      const res = await axios.post(`${API_URL}/api/stylist/chat`, {
+        messages: conversation.map(({ role, content }) => ({ role, content }))
       });
-      setSuggestion(res.data.suggestion);
-      setAvailableProducts(res.data.availableProducts || []);
+
+      const assistantContent = res.data?.message ||
+        "I'm having trouble reaching my styling tools right now. Could you try again in a moment?";
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: assistantContent
+        }
+      ]);
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.error || "Something went wrong. Please try again.");
+      // FIX: Capture the exact error from the backend for better user feedback.
+      const errorMessage = err.response?.data?.error || "Sorry, something went wrong. Please try again.";
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: errorMessage
+        }
+      ]);
     } finally {
       setLoading(false);
     }
   };
 
-  const examplePrompts = [
-    "I have a birthday party this weekend and I want to look elegant. My size is XL.",
-    "I need casual wear for a coffee date. I prefer blue colors and my size is M.",
-    "Looking for professional office wear, size L, budget around $100.",
-    "I'm going to a beach vacation, need comfortable summer clothes, size S."
-  ];
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
+
+  // NEW LOGIC: Check messages for the specific configuration error
+  const isKeyError = messages.some(
+    (m) => m.role === "assistant" && m.content.includes("Gemini API key not configured")
+  );
 
   return (
     <div>
       <Navbar />
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 py-12 px-4 mt-10">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
+        <div className="max-w-3xl mx-auto">
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-2 mb-4">
               <Sparkles className="w-8 h-8 text-blue-600" />
@@ -57,106 +90,83 @@ export default function StylistForm() {
               </h1>
             </div>
             <p className="text-gray-600 text-lg">
-              Describe your situation and get personalized style recommendations
+              Chat with our stylist and get outfit suggestions tailored to your plans.
             </p>
           </div>
-          {/* Main Form */}
-          <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Tell us about your situation
-                </label>
-                <textarea
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="Example: I have a birthday party this weekend and I want to look elegant. My size is XL and I prefer dark colors..."
-                  rows={5}
-                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all resize-none"
-                />
-              </div>
-              {/* Example Prompts */}
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-2">Try these examples:</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {examplePrompts.map((example, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => setPrompt(example)}
-                      className="text-left text-sm p-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors text-gray-700"
-                    >
-                      {example}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-gradient-to-r from-green-600 to-green-600 text-white py-4 px-6 rounded-xl font-semibold text-lg hover:from-purple-700 hover:to-pink-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                {loading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                    Getting Suggestions...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-5 h-5" />
-                    Get Style Suggestions
-                  </>
-                )}
-              </button>
-            </form>
-          </div>
-          {/* AI Suggestion */}
-          {suggestion && (
-            <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 animate-fade-in">
-              <div className="flex items-start gap-3 mb-4">
-                <Sparkles className="w-6 h-6 text-purple-600 mt-1 flex-shrink-0" />
-                <div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-3">Your Personalized Style Recommendation</h3>
-                  <div className="text-gray-700 leading-relaxed whitespace-pre-line">
-                    {suggestion}
-                  </div>
-                </div>
-              </div>
+
+          {/* NEW BANNER: Display a prominent warning if the API key error is found */}
+          {isKeyError && (
+            <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-md shadow-md" role="alert">
+                <p className="font-bold">Configuration Error Detected</p>
+                <p>The backend reported that the **Gemini API key is not configured**. This is a setup error in the server, not a conversation problem. Please ensure the `GeminiSettings:ApiKey` is correctly set.</p>
             </div>
           )}
-          {/* Available Products */}
-          {availableProducts.length > 0 && (
-            <div className="bg-white rounded-2xl shadow-xl p-8">
-              <div className="flex items-center gap-2 mb-6">
-                <ShoppingBag className="w-6 h-6 text-purple-600" />
-                <h3 className="text-2xl font-bold text-gray-800">Available in Our Store</h3>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {availableProducts.map((product) => (
+          {/* END NEW BANNER */}
+
+          <div className="bg-white rounded-2xl shadow-xl flex flex-col h-[70vh]">
+            <div
+              ref={chatBodyRef}
+              className="flex-1 overflow-y-auto px-6 py-6 space-y-4 scrollbar-thin scrollbar-thumb-purple-200"
+            >
+              {messages.map((message, idx) => (
+                <div
+                  key={idx}
+                  className={`flex ${
+                    message.role === "assistant" ? "justify-start" : "justify-end"
+                  }`}
+                >
                   <div
-                    key={product.id}
-                    className="border-2 border-gray-200 rounded-xl p-4 hover:border-purple-400 hover:shadow-lg transition-all"
+                    className={`max-w-[80%] rounded-2xl px-4 py-3 whitespace-pre-line ${
+                      message.role === "assistant"
+                        ? "bg-gradient-to-r from-purple-50 to-blue-50 text-gray-800 border border-purple-100"
+                        : "bg-green-500 text-white"
+                    } ${
+                        // Optional: Highlight the error message bubble itself with red
+                        message.role === "assistant" && message.content.includes("Gemini API key not configured") 
+                            ? "!bg-red-500 !text-white !border-red-600" : ""
+                    }`}
                   >
-                    {product.imageUrl && (
-                      <img
-                        src={product.imageUrl}
-                        alt={product.name}
-                        className="w-full h-48 object-cover rounded-lg mb-4"
-                      />
-                    )}
-                    <h4 className="font-bold text-lg text-gray-800 mb-2">{product.name}</h4>
-                    <p className="text-sm text-gray-600 mb-3">{product.description}</p>
-                    <div className="space-y-1 text-sm">
-                      <p><span className="font-semibold">Category:</span> {product.category}</p>
-                      <p><span className="font-semibold">Color:</span> {product.color}</p>
-                      <p><span className="font-semibold">Size:</span> {product.size}</p>
-                      <p className="text-lg font-bold text-purple-600 mt-2">${product.price}</p>
-                    </div>
+                    {message.content}
                   </div>
-                ))}
+                </div>
+              ))}
+              {messages.length === 0 && !loading && (
+                <div className="flex justify-center">
+                  <div className="bg-white border border-dashed border-gray-200 text-gray-500 rounded-2xl px-4 py-3 text-center">
+                    Start a chat by describing your occasion or style goals.
+                  </div>
+                </div>
+              )}
+              {loading && (
+                <div className="flex justify-start">
+                  <div className="bg-gradient-to-r from-purple-50 to-blue-50 text-gray-600 border border-purple-100 rounded-2xl px-4 py-3">
+                    Typing...
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="border-t border-gray-200 p-4 bg-gray-50">
+              <div className="flex items-center gap-3">
+                <textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  rows={1}
+                  className="flex-1 resize-none rounded-xl border border-gray-200 p-3 focus:outline-none focus:ring-2 focus:ring-purple-200"
+                  placeholder="Describe the occasion, location, or style you're aiming for..."
+                />
+                <button
+                  onClick={sendMessage}
+                  disabled={loading || !input.trim()}
+                  className="bg-green-500 hover:bg-green-600 text-white rounded-xl px-4 py-3 transition-colors flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  <Send className="w-5 h-5" />
+                  Send
+                </button>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>

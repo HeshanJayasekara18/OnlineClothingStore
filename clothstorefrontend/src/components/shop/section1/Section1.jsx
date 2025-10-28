@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import img7 from '../../common/images/img7.jpg';
 
 const API_URL = (process.env.REACT_APP_API_URL || "https://clothstoreapiapp.azurewebsites.net").trim();
@@ -19,6 +20,7 @@ export default function FashionStorePage() {
   const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   // Fetch products from API
   useEffect(() => {
@@ -288,26 +290,34 @@ export default function FashionStorePage() {
               </button>
             </div>
           ) : (
-            filteredAndSortedProducts.map(product => (
-              <div key={product.id} className="flex flex-col gap-3 group cursor-pointer">
-                <div className="relative overflow-hidden">
-                  <div
-                    className="w-full bg-center bg-no-repeat aspect-[3/4] bg-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
-                    style={{ backgroundImage: `url("${product.imageUrl || img7}")` }}
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 rounded-lg"></div>
-                </div>
-                <div>
-                  <p className="text-[#111418] text-sm md:text-base font-medium leading-normal line-clamp-2 group-hover:text-[#1773cf] transition-colors">
-                    {product.name}
-                  </p>
-                  <div className="flex items-center justify-between mt-1">
-                    <p className="text-[#111418] text-base font-bold">${product.price}</p>
+            filteredAndSortedProducts.map(product => {
+              const productId = product.id || product._id;
+              return (
+                <button
+                  type="button"
+                  key={productId || product.name}
+                  onClick={() => productId && navigate(`/product/${productId}`)}
+                  className="flex flex-col gap-3 group text-left cursor-pointer"
+                >
+                  <div className="relative overflow-hidden">
+                    <div
+                      className="w-full bg-center bg-no-repeat aspect-[3/4] bg-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
+                      style={{ backgroundImage: `url("${product.imageUrl || img7}")` }}
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 rounded-lg"></div>
                   </div>
-                  <p className="text-xs text-[#637588] mt-1">{product.material} • {product.category}</p>
-                </div>
-              </div>
-            ))
+                  <div>
+                    <p className="text-[#111418] text-sm md:text-base font-medium leading-normal line-clamp-2 group-hover:text-[#1773cf] transition-colors">
+                      {product.name}
+                    </p>
+                    <div className="flex items-center justify-between mt-1">
+                      <p className="text-[#111418] text-base font-bold">${product.price}</p>
+                    </div>
+                    <p className="text-xs text-[#637588] mt-1">{product.material} • {product.category}</p>
+                  </div>
+                </button>
+              );
+            })
           )}
         </div>
       );

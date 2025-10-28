@@ -15,7 +15,7 @@ export default function Navbar() {
     { name: "Store", href: "/shop" },
     { name: "Women", href: "/home" },
     { name: "Men", href: "/home" },
-    { name: "Assistant", href: "/assitant" },
+    { name: "AI Assistant", href: "/assitant" },
   ];
 
   // Determine active tab based on current route
