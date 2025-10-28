@@ -1,19 +1,33 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
+const sanitizeImageLink = (value = "") => {
+  if (typeof value !== "string") return "";
+  if (value.includes("ibb.co") && !value.includes("i.ibb.co")) {
+    const code = value.split("/").pop() || "";
+    return code ? `https://i.ibb.co/${code}.jpg` : value;
+  }
+  return value;
+};
+
+const createDefaultProduct = () => ({
+  id: null,
+  name: "",
+  description: "",
+  price: "",
+  imageUrl: "",
+  imageUrls: ["", "", ""],
+  gender: "",
+  size: "",
+  category: "",
+  material: "",
+  color: "",
+  stockQuantity: 0,
+  isActive: true,
+});
+
 const ProductForm = () => {
-  const [product, setProduct] = useState({
-    id: null,
-    name: "",
-    description: "",
-    price: "",
-    imageUrl: "",
-    gender: "",
-    size: "",
-    category: "",
-    material: "",
-    color: "",
-  });
+  const [product, setProduct] = useState(createDefaultProduct());
 
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -31,8 +45,22 @@ const ProductForm = () => {
       try {
         const res = await fetch(`${API_URL}/api/products/${productId}`);
         if (res.ok) {
-          const data = await res.json();
-          setProduct(data);
+          const raw = await res.json();
+          const payload = raw?.data || raw;
+          const merged = {
+            ...createDefaultProduct(),
+            ...payload,
+          };
+          merged.price = payload?.price ?? "";
+          merged.stockQuantity = payload?.stockQuantity ?? 0;
+          merged.imageUrl = sanitizeImageLink(payload?.imageUrl) || "";
+          const incomingGallery = Array.isArray(payload?.imageUrls) ? payload.imageUrls : [];
+          const normalizedGallery = [...incomingGallery.filter(Boolean).map(sanitizeImageLink)];
+          while (normalizedGallery.length < 3) {
+            normalizedGallery.push("");
+          }
+          merged.imageUrls = normalizedGallery.slice(0, 3);
+          setProduct(merged);
         }
       } catch (err) {
         console.error("Error fetching product:", err);
@@ -43,22 +71,51 @@ const ProductForm = () => {
 
   // Handle input changes
   const handleChange = (e) => {
-    let { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
+    if (name === "imageUrl") {
+      setProduct({
+        ...product,
+        imageUrl: sanitizeImageLink(value),
+      });
+      return;
+    }
 
-    // Convert ImgBB viewer link to direct image URL
-    if (
-      name === "imageUrl" &&
-      value.includes("ibb.co") &&
-      !value.includes("i.ibb.co")
-    ) {
-      // Example: https://ibb.co/FLLYR7tc → https://i.ibb.co/FLLYR7tc.jpg
-      const code = value.split("/").pop();
-      value = `https://i.ibb.co/${code}.jpg`;
+    if (name === "isActive") {
+      setProduct({
+        ...product,
+        isActive: type === "checkbox" ? checked : Boolean(value),
+      });
+      return;
+    }
+
+    if (name === "price") {
+      setProduct({
+        ...product,
+        price: value === "" ? "" : Number(value),
+      });
+      return;
+    }
+
+    if (name === "stockQuantity") {
+      setProduct({
+        ...product,
+        stockQuantity: value === "" ? "" : Number(value),
+      });
+      return;
     }
 
     setProduct({
       ...product,
-      [name]: name === "price" ? Number(value) : value,
+      [name]: value,
+    });
+  };
+
+  const handleGalleryChange = (index, rawValue) => {
+    const nextGallery = [...product.imageUrls];
+    nextGallery[index] = sanitizeImageLink(rawValue);
+    setProduct({
+      ...product,
+      imageUrls: nextGallery,
     });
   };
 
@@ -79,6 +136,14 @@ const ProductForm = () => {
         delete productData.id;
       }
 
+      productData.imageUrls = (product.imageUrls || [])
+        .map((url) => sanitizeImageLink(url).trim())
+        .filter((url) => !!url);
+      productData.imageUrl = sanitizeImageLink(product.imageUrl);
+      productData.price = product.price === "" ? 0 : Number(product.price);
+      productData.stockQuantity =
+        product.stockQuantity === "" ? 0 : Number(product.stockQuantity);
+
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -95,18 +160,7 @@ const ProductForm = () => {
 
         // Reset form if adding new
         if (!productId) {
-          setProduct({
-            id: null,
-            name: "",
-            description: "",
-            price: "",
-            imageUrl: "",
-            gender: "",
-            size: "",
-            category: "",
-            material: "",
-            color: "",
-          });
+          setProduct(createDefaultProduct());
         }
 
         // Notify dashboard to add product immediately
@@ -121,7 +175,10 @@ const ProductForm = () => {
       console.error("Error:", error);
       setMessage("⚠️ Error connecting to server.");
       setIsLoading(false);
+      return;
     }
+
+    setIsLoading(false);
   };
 
   return (
@@ -222,23 +279,53 @@ const ProductForm = () => {
                 />
               </div>
 
-              {/* Image URL */}
+              {/* Primary Image */}
               <div className="group">
                 <label
                   className="block text-sm font-semibold mb-2"
                   style={{ color: "#2D3561" }}
                 >
-                  Product Image URL
+                  Primary Image URL *
                 </label>
                 <input
                   type="url"
                   name="imageUrl"
                   value={product.imageUrl}
                   onChange={handleChange}
-                  placeholder="Paste ImgBB Viewer link or direct link"
+                  required
+                  placeholder="Paste ImgBB viewer link or direct link"
                   className="w-full px-4 py-3 rounded-xl border-2 transition-all duration-300"
                   style={{ borderColor: "#A8C5C1" }}
                 />
+                <p className="mt-2 text-xs text-gray-500">
+                  Viewer links from ImgBB are auto-converted to direct URLs.
+                </p>
+              </div>
+
+              {/* Additional Gallery Images */}
+              <div className="group">
+                <label
+                  className="block text-sm font-semibold mb-4"
+                  style={{ color: "#2D3561" }}
+                >
+                  Additional Gallery Images (up to 3)
+                </label>
+                <div className="grid md:grid-cols-3 gap-4">
+                  {product.imageUrls.map((url, index) => (
+                    <input
+                      key={index}
+                      type="url"
+                      value={url}
+                      onChange={(event) => handleGalleryChange(index, event.target.value)}
+                      placeholder={`Image ${index + 2}`}
+                      className="w-full px-4 py-3 rounded-xl border-2 transition-all duration-300"
+                      style={{ borderColor: "#A8C5C1" }}
+                    />
+                  ))}
+                </div>
+                <p className="mt-2 text-xs text-gray-500">
+                  Leave blank if not needed. These show as extra thumbnails on the product page.
+                </p>
               </div>
 
               {/* Gender, Size, Category */}
@@ -307,6 +394,42 @@ const ProductForm = () => {
                   className="w-full px-4 py-3 rounded-xl border-2 transition-all duration-300"
                   style={{ borderColor: "#A8C5C1" }}
                 />
+              </div>
+
+              {/* Availability */}
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="group">
+                  <label
+                    className="block text-sm font-semibold mb-2"
+                    style={{ color: "#2D3561" }}
+                  >
+                    Stock Quantity
+                  </label>
+                  <input
+                    type="number"
+                    name="stockQuantity"
+                    min="0"
+                    value={product.stockQuantity}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 rounded-xl border-2 transition-all duration-300"
+                    style={{ borderColor: "#A8C5C1" }}
+                  />
+                </div>
+                <div className="group flex items-end">
+                  <label className="inline-flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      name="isActive"
+                      checked={product.isActive}
+                      onChange={handleChange}
+                      className="h-5 w-5 rounded border-2"
+                      style={{ borderColor: "#A8C5C1" }}
+                    />
+                    <span className="text-sm font-semibold" style={{ color: "#2D3561" }}>
+                      Product is active
+                    </span>
+                  </label>
+                </div>
               </div>
 
               {/* Submit Button */}

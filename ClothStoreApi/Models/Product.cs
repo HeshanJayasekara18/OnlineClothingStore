@@ -22,6 +22,7 @@ namespace ClothStoreApi.Models
         public string Size { get; set; } = string.Empty;
         public string Brand { get; set; } = string.Empty;
         public string ImageUrl { get; set; } = string.Empty;
+        public List<string> ImageUrls { get; set; } = new();
         public int StockQuantity { get; set; } = 0;
         public bool IsActive { get; set; } = true;
         
