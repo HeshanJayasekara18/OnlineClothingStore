@@ -9,14 +9,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 // -------------------- Kestrel Configuration for Docker --------------------
 bool isDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER")?.ToLower() == "true";
-var port = Environment.GetEnvironmentVariable("PORT") ?? "80"; // Azure automatically sets this
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080"; // Azure uses port 8080
 
 if (isDocker)
 {
     builder.WebHost.ConfigureKestrel(options =>
     {
-        options.ListenAnyIP(80);
-        options.ListenAnyIP(8080); // optional
+        options.ListenAnyIP(8080); // Azure Web App expects port 8080
     });
 }
 
@@ -87,29 +86,50 @@ builder.Services.AddScoped<IMongoDatabase>(sp =>
 
 // -------------------- Application Services --------------------
 builder.Services.AddHttpClient(); // For Gemini API calls
-builder.Services.AddScoped<ProductService>();
+
+// Register ProductService with explicit dependencies
+builder.Services.AddScoped<ProductService>(sp => 
+{
+    var database = sp.GetRequiredService<IMongoDatabase>();
+    var settings = sp.GetRequiredService<IOptions<MongoDbSettings>>();
+    var logger = sp.GetRequiredService<ILogger<ProductService>>();
+    return new ProductService(database, settings, logger);
+});
+
 builder.Services.AddScoped<CustomerService>();
 
 // -------------------- Authentication --------------------
 var googleClientId = Environment.GetEnvironmentVariable("Authentication__Google__ClientId") 
-                     ?? builder.Configuration["Authentication:Google:ClientId"];
+                     ?? builder.Configuration["Authentication:Google:ClientId"]
+                     ?? builder.Configuration["Authentication__Google__ClientId"];
+
 var googleClientSecret = Environment.GetEnvironmentVariable("Authentication__Google__ClientSecret") 
-                         ?? builder.Configuration["Authentication:Google:ClientSecret"];
+                         ?? builder.Configuration["Authentication:Google:ClientSecret"]
+                         ?? builder.Configuration["Authentication__Google__ClientSecret"];
 
-builder.Services.AddAuthentication(options =>
+var authBuilder = builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 })
-.AddCookie()
-.AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
-{
-    if (string.IsNullOrEmpty(googleClientId) || string.IsNullOrEmpty(googleClientSecret))
-        Console.WriteLine("Warning: Google OAuth ClientId or ClientSecret is missing!");
+.AddCookie();
 
-    options.ClientId = googleClientId;
-    options.ClientSecret = googleClientSecret;
-    options.CallbackPath = "/signin-google";
-});
+// Only add Google auth if credentials are provided
+if (!string.IsNullOrEmpty(googleClientId) && !string.IsNullOrEmpty(googleClientSecret))
+{
+    authBuilder.AddGoogle(options =>
+    {
+        options.ClientId = googleClientId;
+        options.ClientSecret = googleClientSecret;
+    });
+    
+    Console.WriteLine("Google Authentication is enabled");
+}
+else
+{
+    Console.WriteLine("Google Authentication is disabled - missing ClientId or ClientSecret");
+}
 
 // -------------------- OpenAI & Gemini Settings --------------------
 builder.Services.Configure<OpenAISettings>(builder.Configuration.GetSection("OpenAI"));

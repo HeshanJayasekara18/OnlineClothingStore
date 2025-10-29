@@ -19,7 +19,7 @@ namespace ClothStoreApi.Controllers
 
 Follow this structure in Markdown:
 1. Start with a warm one-line acknowledgement that references the occasion if mentioned.
-2. Provide a short "Outfit snapshot" sentence summarizing the overall look.
+2. Provide a short ""Outfit snapshot"" sentence summarizing the overall look.
 3. Present bullet-point sections titled **Tops**, **Bottoms**, **Footwear**, and **Accessories** (omit a section only if it truly has no recommendations). Include color palettes and fabric guidance.
 4. Add a **Fit & Comfort Tips** section that uses the user's size or body clues. If size information is missing, politely ask for it here.
 5. Add a **Budget Pointers** section if any budget context is available; otherwise give a general smart-shopping tip.
@@ -31,8 +31,8 @@ Always keep the tone encouraging, modern, and practical. Avoid repeating the use
             IOptions<GeminiSettings> geminiSettings,
             IHttpClientFactory httpClientFactory)
         {
-            _geminiSettings = geminiSettings.Value;
-            _httpClient = httpClientFactory.CreateClient();
+            _geminiSettings = geminiSettings?.Value ?? throw new ArgumentNullException(nameof(geminiSettings));
+            _httpClient = httpClientFactory?.CreateClient() ?? throw new ArgumentNullException(nameof(httpClientFactory));
             _httpClient.Timeout = TimeSpan.FromSeconds(30);
             _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("AspNetCoreGeminiStylist/1.0");
         }
@@ -45,17 +45,17 @@ Always keep the tone encouraging, modern, and practical. Avoid repeating the use
                 return BadRequest(new { error = "Please include at least one chat message." });
             }
 
-            if (string.IsNullOrWhiteSpace(_geminiSettings.ApiKey))
+            if (string.IsNullOrWhiteSpace(_geminiSettings?.ApiKey))
             {
                 return StatusCode(500, new { error = "Gemini API key not configured" });
             }
 
             var sanitizedMessages = request.Messages
-                .Where(m => m != null && !string.IsNullOrWhiteSpace(m.Content))
+                .Where(m => m != null && !string.IsNullOrWhiteSpace(m?.Content))
                 .Select(m => new ChatMessage
                 {
-                    Role = NormalizeRole(m.Role),
-                    Content = m.Content.Trim()
+                    Role = NormalizeRole(m?.Role),
+                    Content = m?.Content?.Trim() ?? string.Empty
                 })
                 .ToList();
 
@@ -94,9 +94,9 @@ Always keep the tone encouraging, modern, and practical. Avoid repeating the use
 
         private async Task<string> CallGeminiChatAsync(List<ChatMessage> messages)
         {
-            var apiKey = _geminiSettings.ApiKey;
+            var apiKey = _geminiSettings?.ApiKey ?? throw new InvalidOperationException("Gemini API key is not configured");
             
-            // FIX: Updated to use current, stable model alias: gemini-2.5-flash
+            // Try different Gemini models in order of preference
             var modelsToTry = new[]
             {
                 ("gemini-2.5-flash", "v1beta"), // Best practice, modern, and cheap model
@@ -122,6 +122,7 @@ Always keep the tone encouraging, modern, and practical. Avoid repeating the use
                 {
                     // This will catch the 404 error and log it, allowing the next model to be attempted.
                     Console.WriteLine($"✗ Failed with {model}: {ex.Message}");
+                    // Continue to next model
                 }
             }
 
@@ -334,18 +335,21 @@ Always keep the tone encouraging, modern, and practical. Avoid repeating the use
         }
 
         // Remaining Extract methods (ExtractSize, ExtractGender, ExtractOccasion, etc.) remain the same.
-        // ... (The rest of the code is unchanged for brevity)
         private string ExtractSize(string message)
         {
+            if (string.IsNullOrEmpty(message)) return string.Empty;
+            
             var sizePattern = new[] { "xs", "s", "m", "l", "xl", "xxl", "xxxl", "small", "medium", "large" };
             foreach (var size in sizePattern)
             {
-                if (message.Contains($"size {size}") || message.Contains($"size is {size}") || message.Contains($"{size} size"))
+                if (message.Contains($"size {size}", StringComparison.OrdinalIgnoreCase) || 
+                    message.Contains($"size is {size}", StringComparison.OrdinalIgnoreCase) || 
+                    message.Contains($"{size} size", StringComparison.OrdinalIgnoreCase))
                 {
                     return size;
                 }
             }
-            return "";
+            return string.Empty;
         }
 
         private string ExtractGender(string message)
@@ -394,7 +398,7 @@ Always keep the tone encouraging, modern, and practical. Avoid repeating the use
             return "";
         }
     }
-    // Gemini API Response Models (unchanged)
+
     public class GeminiResponse
     {
         [JsonPropertyName("candidates")]
@@ -415,8 +419,11 @@ Always keep the tone encouraging, modern, and practical. Avoid repeating the use
         [JsonPropertyName("finishReason")]
         public string? FinishReason { get; set; }
         
-        [JsonPropertyName("avgLogprobs")]
-        public double? AvgLogprobs { get; set; }
+        [JsonPropertyName("index")]
+        public int Index { get; set; }
+        
+        [JsonPropertyName("safetyRatings")]
+        public List<SafetyRating>? SafetyRatings { get; set; }
     }
 
     public class Content
@@ -432,6 +439,15 @@ Always keep the tone encouraging, modern, and practical. Avoid repeating the use
     {
         [JsonPropertyName("text")]
         public string? Text { get; set; }
+    }
+
+    public class SafetyRating
+    {
+        [JsonPropertyName("category")]
+        public string? Category { get; set; }
+        
+        [JsonPropertyName("probability")]
+        public string? Probability { get; set; }
     }
 
     public class UsageMetadata

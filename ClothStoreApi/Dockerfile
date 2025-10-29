@@ -1,26 +1,29 @@
-# Use ASP.NET runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
-WORKDIR /app
-EXPOSE 8080
-
 # Use SDK image for building
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-COPY ["ClothStoreApi.csproj", "."]
+# Copy csproj and restore as distinct layers
+COPY ["ClothStoreApi.csproj", "./"]
 RUN dotnet restore "ClothStoreApi.csproj"
 
+# Copy everything else and build
 COPY . .
-RUN dotnet publish "ClothStoreApi.csproj" -c Release -o /app/publish
+RUN dotnet build "ClothStoreApi.csproj" -c Release -o /app/build
+RUN dotnet publish "ClothStoreApi.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-# Final stage
-FROM base AS final
+# Build runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
+EXPOSE 8080
+ENV ASPNETCORE_URLS=http://+:8080
+
+# Copy the published app
 COPY --from=build /app/publish .
 
-# Non-root user
-RUN adduser --disabled-password --home /app --gecos '' appuser && chown -R appuser /app
+# Create a non-root user and set permissions
+RUN adduser --disabled-password --home /app --gecos '' appuser && \
+    chown -R appuser:appuser /app
 USER appuser
 
-# Keep container running via dotnet entrypoint
+# Set the entry point
 ENTRYPOINT ["dotnet", "ClothStoreApi.dll"]
