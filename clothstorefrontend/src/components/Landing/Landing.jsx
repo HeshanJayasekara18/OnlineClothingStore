@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, ShoppingBag, Star, ArrowRight } from 'lucide-react';
 import Navbar from '../common/navbar/Navbar';
+import ChatBot from '../common/ChatBot/ChatBot';
 import img1 from '../common/images/img1.jpg';
 import img2 from '../common/images/img2.jpg';
 import img3 from '../common/images/img3.jpg';
@@ -326,6 +327,9 @@ export default function ClothingStoreLanding() {
           </div>
         </div>
       </section>
+
+      {/* Floating Chat Bot */}
+      <ChatBot />
     </div>
   );
 }

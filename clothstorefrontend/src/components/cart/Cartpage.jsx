@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import axios from "axios";
 import Navbar from "../common/navbar/Navbar";
+import ChatBot from "../common/ChatBot/ChatBot";
 import { ShoppingCart, Trash2, Loader2, Minus, Plus } from "lucide-react";
 
 const API_URL = (process.env.REACT_APP_API_URL || "https://clothstoreapiapp.azurewebsites.net").trim();
@@ -67,6 +68,9 @@ export default function Cartpage() {
       quantity: item.quantity
     }));
     localStorage.setItem(STORAGE_KEY, JSON.stringify(serializable));
+    
+    // Dispatch custom event to notify other components (like Navbar)
+    window.dispatchEvent(new Event('cartUpdated'));
   }, [cartItems]);
 
   useEffect(() => {
@@ -493,6 +497,9 @@ export default function Cartpage() {
           </div>
         </div>
       </div>
+      
+      {/* Floating Chat Bot */}
+      <ChatBot />
     </div>
   );
 }

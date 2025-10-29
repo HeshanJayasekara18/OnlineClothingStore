@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../common/navbar/Navbar";
+import ChatBot from "../common/ChatBot/ChatBot";
 import { Loader2, CheckCircle2, ShoppingCart, ArrowRight } from "lucide-react";
 import placeholderImage from "../common/images/img7.jpg";
 
@@ -12,10 +13,14 @@ const normalizeCartItem = (product, quantity = 1) => {
   if (!product) {
     return null;
   }
-  const identifier = product.id || product._id;
+  
+  // Try multiple ID field names (MongoDB uses _id, some APIs use id)
+  const identifier = product.id || product._id || product.productId;
+  
   if (!identifier) {
     return null;
   }
+  
   const quantityValue = Number(quantity) > 0 ? Math.floor(Number(quantity)) : 1;
   return {
     id: identifier,
@@ -115,10 +120,12 @@ export default function ProductDetails() {
     if (!normalized) {
       return;
     }
+    
     const current = loadCart();
     const existingIndex = current.findIndex(
       (item) => item.productId === normalized.productId || item.id === normalized.productId
     );
+    
     if (existingIndex >= 0) {
       current[existingIndex] = {
         ...current[existingIndex],
@@ -134,7 +141,12 @@ export default function ProductDetails() {
     } else {
       current.push(normalized);
     }
+    
     saveCart(current);
+    
+    // Dispatch custom event to notify Navbar and other components
+    window.dispatchEvent(new Event('cartUpdated'));
+    
     setJustAdded(true);
     setTimeout(() => setJustAdded(false), 2500);
   };
@@ -320,6 +332,9 @@ export default function ProductDetails() {
           </div>
         </div>
       </div>
+      
+      {/* Floating Chat Bot */}
+      <ChatBot />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { User } from 'lucide-react';
+import { User, ShoppingCart } from 'lucide-react';
 
 
 export default function Navbar() {
@@ -8,6 +8,7 @@ export default function Navbar() {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [firstName, setFirstName] = useState(null);
+  const [cartItemCount, setCartItemCount] = useState(0);
 
   const navItems = [
     { name: "Home", href: "/home" },
@@ -22,7 +23,8 @@ export default function Navbar() {
   const getActiveTab = () => {
     const path = location.pathname;
     if (path === "/shop") return "Store";
-    if (path === "/assitant") return "Assistant";
+    if (path === "/cart") return "Cart";
+    if (path === "/assitant") return "AI Assistant";
     if (path === "/home") return "Home";
     return "Home"; // default
   };
@@ -48,6 +50,33 @@ export default function Navbar() {
     updateUser();
     window.addEventListener("storage", updateUser);
     return () => window.removeEventListener("storage", updateUser);
+  }, []);
+
+  // Update cart item count from localStorage
+  useEffect(() => {
+    const updateCartCount = () => {
+      try {
+        const cart = JSON.parse(localStorage.getItem("clothstore_cart") || "[]");
+        const totalItems = Array.isArray(cart) 
+          ? cart.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0) 
+          : 0;
+        setCartItemCount(totalItems);
+      } catch {
+        setCartItemCount(0);
+      }
+    };
+
+    updateCartCount();
+    window.addEventListener("storage", updateCartCount);
+    
+    // Also listen for custom cart update event
+    const handleCartUpdate = () => updateCartCount();
+    window.addEventListener("cartUpdated", handleCartUpdate);
+    
+    return () => {
+      window.removeEventListener("storage", updateCartCount);
+      window.removeEventListener("cartUpdated", handleCartUpdate);
+    };
   }, []);
 
   const handleTabClick = (href) => {
@@ -99,6 +128,20 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-4">
+          {/* Cart Icon */}
+          <button
+            onClick={() => navigate("/cart")}
+            className="relative flex items-center justify-center w-9 h-9 rounded-full hover:bg-[#f0f2f4] transition-colors"
+            title="Shopping Cart"
+          >
+            <ShoppingCart className="w-5 h-5 text-[#111418]" />
+            {cartItemCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-[#228d0f] rounded-full">
+                {cartItemCount > 99 ? '99+' : cartItemCount}
+              </span>
+            )}
+          </button>
+
           {firstName ? (
             <>
               <span className="text-[#111418] text-sm font-medium">
@@ -138,6 +181,20 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Mobile Cart Icon */}
+          <button
+            onClick={() => navigate("/cart")}
+            className="relative flex items-center justify-center w-9 h-9"
+            title="Shopping Cart"
+          >
+            <ShoppingCart className="w-5 h-5 text-[#111418]" />
+            {cartItemCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex items-center justify-center w-4 h-4 text-[10px] font-bold text-white bg-[#228d0f] rounded-full">
+                {cartItemCount > 99 ? '99+' : cartItemCount}
+              </span>
+            )}
+          </button>
+
           {firstName ? (
             <span className="text-[#111418] text-xs font-medium hidden xs:block">
               Hi, {firstName} 👋
