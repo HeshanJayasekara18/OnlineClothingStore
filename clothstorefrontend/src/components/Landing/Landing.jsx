@@ -62,7 +62,7 @@ export default function ClothingStoreLanding() {
   ];
 
   const latestDesigns = [
-    { image: 'https://images.unsplash.com/photo-1558769132-cb1aea3c8908?w=500&h=600&fit=crop', name: 'Floral Maxi Dress', price: '$99.99', tag: 'NEW' },
+    { image: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400&h=500&fit=crop', name: 'Floral Maxi Dress', price: '$99.99', tag: 'NEW' },
     { image: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=500&h=600&fit=crop', name: 'Oversized Hoodie', price: '$69.99', tag: 'TRENDING' },
     { image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500&h=600&fit=crop', name: 'Linen Suit', price: '$149.99', tag: 'HOT' },
     { image: 'https://images.unsplash.com/photo-1564859228273-274232fdb516?w=500&h=600&fit=crop', name: 'Vintage Jacket', price: '$119.99', tag: 'NEW' }

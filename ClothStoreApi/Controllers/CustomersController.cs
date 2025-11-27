@@ -121,35 +121,58 @@ namespace ClothStoreApi.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest loginData)
         {
-            if (loginData == null || string.IsNullOrEmpty(loginData.Email) || string.IsNullOrEmpty(loginData.Password))
-                return BadRequest("Email and Password are required.");
+            if (loginData == null || string.IsNullOrWhiteSpace(loginData.Email) || string.IsNullOrWhiteSpace(loginData.Password))
+                return BadRequest(new { success = false, error = "Email and password required." });
 
+            var email = loginData.Email.ToLower().Trim();
+            Customer user = null;
             try
             {
-                _logger.LogInformation("Login attempt for email: {Email}", loginData.Email);
-                var customer = await _customerService.GetByEmailAsync(loginData.Email);
-                if (customer == null || customer.Password != loginData.Password)
-                {
-                    _logger.LogWarning("Login failed for email: {Email}", loginData.Email);
-                    return Unauthorized("Invalid email or password.");
-                }
-
-                _logger.LogInformation("Login successful for email: {Email}", loginData.Email);
-                return Ok(new
-                {
-                    customer.Id,
-                    customer.FirstName,
-                    customer.LastName,
-                    customer.Name,
-                    customer.Email,
-                    customer.Picture
-                });
+                user = await _customerService.GetByEmailAsync(email);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during login for email {Email}", loginData.Email);
-                return StatusCode(500, "An error occurred while logging in.");
+                _logger.LogError(ex, "Server error retrieving user by email: {Email}", email);
+                // return JSON error, avoid plain text
+                return StatusCode(500, new { success = false, error = "Server error retrieving user.", details = ex.Message });
             }
+
+            _logger.LogInformation("Login check for {email}: userFound={found}", email, user != null);
+            if (user == null)
+                return Unauthorized(new { success = false, error = "Invalid credentials." });
+
+            _logger.LogInformation("User {email} PasswordHash present: {hasHash}", email, !string.IsNullOrEmpty(user.PasswordHash));
+
+            bool verified = false;
+            try
+            {
+                verified = !string.IsNullOrEmpty(user.PasswordHash) && BCrypt.Net.BCrypt.Verify(loginData.Password, user.PasswordHash);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "BCrypt.Verify failed for {email}", email);
+            }
+
+            if (!verified)
+            {
+                _logger.LogWarning("Password verification failed for {email}", email);
+                return Unauthorized(new { success = false, error = "Invalid credentials." });
+            }
+
+            // Successful login — return user info (hide sensitive fields)
+            var result = new
+            {
+                success = true,
+                data = new {
+                    id = user.Id,
+                    email = user.Email,
+                    role = user.Role,
+                    name = user.Name ?? $"{user.FirstName} {user.LastName}".Trim(),
+                    picture = user.Picture
+                }
+            };
+
+            return Ok(result);
         }
 
         // -------------------- Current User --------------------
@@ -190,3 +213,12 @@ namespace ClothStoreApi.Controllers
         }
     }
 }
+
+// compute bcrypt hash in C# or use AdminController to set. Example update if you already have a hash:
+// NOTE: The following is a MongoDB shell command and must NOT be placed in C# source.
+// Run it in the mongo shell or a MongoDB client instead:
+//
+// db.Customers.updateOne(
+//   { email: "heshan@gmail.com" },
+//   { $set: { PasswordHash: "<bcrypt-hash-here>", Role: "Admin" } }
+// );

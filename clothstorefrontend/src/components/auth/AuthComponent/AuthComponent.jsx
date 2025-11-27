@@ -6,6 +6,9 @@ import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import img8 from '../../common/images/img8.jpg';
 import LoadingScreen from '../../common/LoadingScreen/LoadingScreen';
 
+const API_URL = process.env.REACT_APP_API_URL || "";
+const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || "";
+
 export default function AuthComponent({ onLogin }) {
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -16,8 +19,6 @@ export default function AuthComponent({ onLogin }) {
   const [showLoadingScreen, setShowLoadingScreen] = useState(false);
 
   const navigate = useNavigate();
-  const API_URL = process.env.REACT_APP_API_URL || "https://clothstoreapiapp.azurewebsites.net";
-  const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || "337988956225-np362jqlp8nhscqq76hmbsqfh3fjsvme.apps.googleusercontent.com";
 
   // -------------------- Persistent login --------------------
   useEffect(() => {
@@ -61,66 +62,50 @@ export default function AuthComponent({ onLogin }) {
   // -------------------- Handle form --------------------
   const handleInputChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const handleSubmit = async () => {
-    if (isSignUp) {
-      if (formData.password !== formData.confirmPassword) { 
-        alert("Passwords don't match!"); 
-        return; 
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/api/customers/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          email: formData.email?.toLowerCase?.().trim() ?? "",
+          password: formData.password ?? ""
+        })
+      });
+
+      const payload = await res.json();
+
+      if (!res.ok) {
+        const message = payload?.error || payload?.message || "Login failed";
+        alert(message);
+        return;
       }
-      try {
-        setLoading(true);
-        const res = await fetch(`${API_URL}/api/customers/register`, {
-          method: "POST",
-          headers: { 
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-          },
-          body: JSON.stringify(formData),
-        });
-        
-        if (!res.ok) {
-          const errorText = await res.text();
-          throw new Error(errorText || "Registration failed");
-        }
-        
-        alert("Registered successfully! Please login now.");
-        setIsSignUp(false);
-        setFormData({ ...formData, password: "", confirmPassword: "" });
-      } catch (err) { 
-        alert(err.message || "Error registering user"); 
+
+      // payload may be { success:true, data: user } or plain user object
+      const user = payload?.data ?? payload;
+
+      // persist user and notify parent
+      setLoggedUser(user);
+      localStorage.setItem("loggedUser", JSON.stringify(user));
+      if (typeof onLogin === "function") onLogin(user);
+
+      // If admin -> navigate to admin dashboard, else to home
+      const email = (user?.email || "").toLowerCase();
+      const role = (user?.role || "").toLowerCase();
+
+      if (role === "admin" || email === "heshan@admin.com") {
+        navigate("/admin-product-dashboard");
+      } else {
+        navigate("/home");
       }
-      finally { setLoading(false); }
-    } else {
-      try {
-        setLoading(true);
-        const res = await fetch(`${API_URL}/api/customers/login`, {
-          method: "POST",
-          headers: { 
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-          },
-          credentials: "include",
-          body: JSON.stringify({ email: formData.email, password: formData.password }),
-        });
-        
-        if (!res.ok) {
-          const errorText = await res.text();
-          throw new Error(errorText || "Login failed");
-        }
-        const user = await res.json();
-        setLoggedUser(user);
-        localStorage.setItem("loggedUser", JSON.stringify(user));
-        if (onLogin) onLogin(user);
-        
-        // Show loading screen before navigation
-        setShowLoadingScreen(true);
-        setTimeout(() => {
-          navigate("/home");
-        }, 3000); // 3 second loading animation
-      } catch (err) { 
-        alert(err.message || "Error logging in"); 
-      }
-      finally { setLoading(false); }
+    } catch (err) {
+      console.error("Login error:", err);
+      alert("Login failed. See console for details.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -320,7 +305,7 @@ export default function AuthComponent({ onLogin }) {
 
                 <button 
                   type="button" 
-                  onClick={handleSubmit} 
+                  onClick={handleLogin} 
                   disabled={loading}
                   className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-3 rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-all disabled:opacity-50"
                 >
